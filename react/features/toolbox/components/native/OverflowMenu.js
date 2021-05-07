@@ -136,24 +136,24 @@ class OverflowMenu extends PureComponent<Props, State> {
                 onSwipe = { this._onSwipe }
                 renderHeader = { this._renderMenuExpandToggle }>
                 <AudioRouteButton { ...buttonProps } />
-                {!toolbarButtons.has('invite') && <InviteButton { ...buttonProps } />}
+                {/* {!toolbarButtons.has('invite') && <InviteButton { ...buttonProps } />} */}
                 <AudioOnlyButton { ...buttonProps } />
-                {!toolbarButtons.has('raisehand') && <RaiseHandButton { ...buttonProps } />}
-                <SecurityDialogButton { ...buttonProps } />
-                <ScreenSharingButton { ...buttonProps } />
-                <MoreOptionsButton { ...moreOptionsButtonProps } />
-                <Collapsible collapsed = { !showMore }>
+                {/* {!toolbarButtons.has('raisehand') && <RaiseHandButton { ...buttonProps } />} */}
+                {/* <SecurityDialogButton { ...buttonProps } /> */}
+                {/* <ScreenSharingButton { ...buttonProps } /> */}
+                {/* <MoreOptionsButton { ...moreOptionsButtonProps } /> */}
+                {/* <Collapsible collapsed = { !showMore }> */}
                     {!toolbarButtons.has('togglecamera') && <ToggleCameraButton { ...buttonProps } />}
                     {!toolbarButtons.has('tileview') && <TileViewButton { ...buttonProps } />}
-                    <RecordButton { ...buttonProps } />
-                    <LiveStreamButton { ...buttonProps } />
-                    <SharedVideoButton { ...buttonProps } />
-                    <ClosedCaptionButton { ...buttonProps } />
-                    <SharedDocumentButton { ...buttonProps } />
-                    <MuteEveryoneButton { ...buttonProps } />
-                    <MuteEveryonesVideoButton { ...buttonProps } />
-                    <HelpButton { ...buttonProps } />
-                </Collapsible>
+                    {/* <RecordButton { ...buttonProps } /> */}
+                    {/* <LiveStreamButton { ...buttonProps } /> */}
+                    {/* <SharedVideoButton { ...buttonProps } /> */}
+                    {/* <ClosedCaptionButton { ...buttonProps } /> */}
+                    {/* <SharedDocumentButton { ...buttonProps } /> */}
+                    {/* <MuteEveryoneButton { ...buttonProps } /> */}
+                    {/* <MuteEveryonesVideoButton { ...buttonProps } /> */}
+                    {/* <HelpButton { ...buttonProps } /> */}
+                {/* </Collapsible> */}
             </BottomSheet>
         );
     }
