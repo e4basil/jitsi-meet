@@ -66,7 +66,7 @@ const NavigationBar = (props: Props) => {
                             <Text
                                 numberOfLines = { 1 }
                                 style = { styles.roomName }>
-                                { props._meetingName }
+                                {/* { props._meetingName } */}
                             </Text>
                         </View>
                 }
