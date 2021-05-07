@@ -4,6 +4,12 @@ rules:                      # Array of rules
     upstream: jitsi:master    # Required. Must be in the same fork network.
     mergeMethod: rebase  # Optional, one of [none, merge, squash, rebase, hardreset], Default: none.
     mergeUnstable: false    # Optional, merge pull request even when the mergeable_state is not clean. Default: false
+    assignees:              # Optional
+      - e4basil
+    reviewers:              # Optional
+      - e4basil
+    conflictReviewers:      # Optional, on merge conflict assign a reviewer
+      - e4basil
   - base: dev
     upstream: master        # Required. Can be a branch in the same forked repo.
     assignees:              # Optional
