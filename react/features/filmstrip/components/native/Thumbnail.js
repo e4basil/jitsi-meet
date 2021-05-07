@@ -234,15 +234,15 @@ function _mapDispatchToProps(dispatch: Function, ownProps): Object {
         _onThumbnailLongPress() {
             const { participant } = ownProps;
 
-            if (participant.local) {
-                dispatch(openDialog(ConnectionStatusComponent, {
-                    participantID: participant.id
-                }));
-            } else {
-                dispatch(openDialog(RemoteVideoMenu, {
-                    participant
-                }));
-            }
+            // if (participant.local) {
+            //     dispatch(openDialog(ConnectionStatusComponent, {
+            //         participantID: participant.id
+            //     }));
+            // } else {
+            //     dispatch(openDialog(RemoteVideoMenu, {
+            //         participant
+            //     }));
+            // }
         }
     };
 }
