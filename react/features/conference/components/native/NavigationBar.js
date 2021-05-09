@@ -1,7 +1,7 @@
 // @flow
 
 import React from 'react';
-import { Text, View } from 'react-native';
+import { Text, View, Image } from 'react-native';
 
 import { getConferenceName } from '../../../base/conference';
 import { getFeatureFlag, CONFERENCE_TIMER_ENABLED, MEETING_NAME_ENABLED } from '../../../base/flags';
@@ -54,8 +54,15 @@ const NavigationBar = (props: Props) => {
             pointerEvents = 'box-none'
             style = { styles.navBarWrapper }>
             <View style = { styles.pipButtonContainer }>
-                <PictureInPictureButton
-                    styles = { styles.pipButton } />
+            <Image
+                    style={{ width: 35, height: 35,  }} resizeMode="contain" imageStyle={{ opacity: 1 }}
+                    source={{
+                        uri:
+                          'https://meet.blueehr.com/images/be.png',
+                      }}
+                />
+                {/* <PictureInPictureButton */}
+                    {/* styles = { styles.pipButton } /> */}
             </View>
             <View
                 pointerEvents = 'box-none'

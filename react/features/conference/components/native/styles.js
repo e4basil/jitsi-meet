@@ -113,7 +113,7 @@ export default {
         flexShrink: 1,
         height: 28,
         justifyContent: 'center',
-        paddingHorizontal: 10
+        paddingHorizontal: 2
     },
 
     roomNameWrapper: {
