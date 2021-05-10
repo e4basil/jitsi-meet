@@ -102,7 +102,9 @@ class WaitForOwnerDialog extends PureComponent<Props> {
                 <span>
                     {
                         translateToHTML(
-                            t, 'dialog.WaitForHostMsg', { room })
+                            t, 'dialog.WaitForHostMsg', ''
+                            // { room }
+                            )
                     }
                 </span>
             </Dialog>
