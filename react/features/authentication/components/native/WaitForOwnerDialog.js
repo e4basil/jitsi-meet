@@ -61,13 +61,18 @@ class WaitForOwnerDialog extends Component<Props> {
             _room: room
         } = this.props;
 
+        const {
+            empty
+        } = '';
+
         return (
             <ConfirmDialog
                 cancelKey = 'dialog.Cancel'
                 contentKey = {
                     {
                         key: 'dialog.WaitForHostMsgWOk',
-                        params: { room }
+                        // params: { room }
+                        params: { empty }
                     }
                 }
                 okKey = 'dialog.Ok'
