@@ -282,8 +282,8 @@
         "transcribing": "transskribado",
         "unlockRoom": "Forigi la $t(lockRoomPassword)n de la ĉambro",
         "userPassword": "uzantopasvorto",
-        "WaitForHostMsg": "La kunveno <b>{{room}}</b> ankoraŭ ne komencis. Se vi estas la gastiganto, bonvolu aŭtentiĝi. Alikaze atendu, ĝis la gastiganto venos.",
-        "WaitForHostMsgWOk": "La kunveno <b>{{room}}</b> ankoraŭ ne komencis. Se vi estas la gastiganto, bonvolu puŝi “Bone” por aŭtentiĝi. Alikaze atendu, ĝis la gastiganto venos.",
+        "WaitForHostMsg": "La kunveno<b>{{room}}</b> ankoraŭ ne komencis. Se vi estas la gastiganto, bonvolu aŭtentiĝi. Alikaze atendu, ĝis la gastiganto venos.",
+        "WaitForHostMsgWOk": "La kunveno<b>{{room}}</b> ankoraŭ ne komencis. Se vi estas la gastiganto, bonvolu puŝi “Bone” por aŭtentiĝi. Alikaze atendu, ĝis la gastiganto venos.",
         "WaitingForHost": "Atendo de la gastiga komputilo…",
         "Yes": "Jes",
         "yourEntireScreen": "Via tuta ekrano"

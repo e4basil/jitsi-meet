@@ -278,8 +278,8 @@
         "transcribing": "Umrita (transcribing)",
         "unlockRoom": "Fjarlægja $t(lockRoomPassword) fundar",
         "userPassword": "lykilorð notandans",
-        "WaitForHostMsg": "Fjarfundurinn <b>{{room}}</b> er ekki byrjaður. Ef þú ert gestgjafinn skaltu auðkenna þig. Annars ættiðu að bíða eftir að gestgjafinn skrái sig inn.",
-        "WaitForHostMsgWOk": "Fjarfundurinn <b>{{room}}</b> er ekki byrjaður. Ef þú ert gestgjafinn skaltu ýta á 'Í lagi' til að auðkenna þig. Annars ættiðu að bíða eftir að gestgjafinn skrái sig inn.",
+        "WaitForHostMsg": "Fjarfundurinn<b>{{room}}</b> er ekki byrjaður. Ef þú ert gestgjafinn skaltu auðkenna þig. Annars ættiðu að bíða eftir að gestgjafinn skrái sig inn.",
+        "WaitForHostMsgWOk": "Fjarfundurinn<b>{{room}}</b> er ekki byrjaður. Ef þú ert gestgjafinn skaltu ýta á 'Í lagi' til að auðkenna þig. Annars ættiðu að bíða eftir að gestgjafinn skrái sig inn.",
         "WaitingForHost": "Bíð eftir að gestgjafanum ...",
         "Yes": "Já",
         "yourEntireScreen": "Allur skjárinn þinn"
