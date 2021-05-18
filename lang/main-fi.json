@@ -252,8 +252,8 @@
         "transcribing": "Puhtaaksikirjoitus",
         "unlockRoom": "",
         "userPassword": "käyttäjän salasana",
-        "WaitForHostMsg": "Kokous <b>{{room}}</b> ei ole vielä alkanut. Jos olet vetäjä, todenna henkilöllisyytesi. Muussa tapauksessa odota vetäjän saapumista.",
-        "WaitForHostMsgWOk": "Kokous <b>{{room}}</b> ei ole vielä alkanut. Jos olet vetäjä, todenna henkilöllisyytesi OK-painikkeella. Muussa tapauksessa odota vetäjän saapumista.",
+        "WaitForHostMsg": "Kokous<b>{{room}}</b> ei ole vielä alkanut. Jos olet vetäjä, todenna henkilöllisyytesi. Muussa tapauksessa odota vetäjän saapumista.",
+        "WaitForHostMsgWOk": "Kokous<b>{{room}}</b> ei ole vielä alkanut. Jos olet vetäjä, todenna henkilöllisyytesi OK-painikkeella. Muussa tapauksessa odota vetäjän saapumista.",
         "WaitingForHost": "Odotetaan vetäjää…",
         "Yes": "Kyllä",
         "yourEntireScreen": "Koko näyttö"

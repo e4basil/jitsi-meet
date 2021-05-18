@@ -277,8 +277,8 @@
         "transcribing": "Transkribeerimine",
         "unlockRoom": "Eemalda kõne parool",
         "userPassword": "kasutaja parool",
-        "WaitForHostMsg": "Kõne <b>{{room}}</b> ei ole veel alanud. Autendi ennast, kui oled võõrustaja. Külalisena oota, kuni võõrustaja saabub.",
-        "WaitForHostMsgWOk": "Kõne <b>{{room}}</b> ei ole veel alanud. Kui oled võõrustaja, vajuta OK, et ennast autentida. Külalisena oota, kuni võõrustaja saabub.",
+        "WaitForHostMsg": "Kõne<b>{{room}}</b> ei ole veel alanud. Autendi ennast, kui oled võõrustaja. Külalisena oota, kuni võõrustaja saabub.",
+        "WaitForHostMsgWOk": "Kõne<b>{{room}}</b> ei ole veel alanud. Kui oled võõrustaja, vajuta OK, et ennast autentida. Külalisena oota, kuni võõrustaja saabub.",
         "WaitingForHost": "Võõrustaja ootamine…",
         "Yes": "Jah",
         "yourEntireScreen": "Täisekraan"
