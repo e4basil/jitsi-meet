@@ -58,7 +58,7 @@ const NavigationBar = (props: Props) => {
                     style={{ width: 35, height: 35,  }} resizeMode="contain" imageStyle={{ opacity: 1 }}
                     source={{
                         uri:
-                          'https://meet.blueehr.com/images/be.png',
+                          'https://meet.xxxx.com/images/be.png',
                       }}
                 />
                 {/* <PictureInPictureButton */}
