@@ -261,12 +261,12 @@ var interfaceConfig = {
     /**
      * Specify mobile app scheme for opening the app from the mobile browser.
      */
-    APP_SCHEME: 'com.blueehr.bluetelemedlite',
+    APP_SCHEME: 'com.yy.xxxx',
 
     /**
      * Specify the Android app package name.
      */
-    ANDROID_APP_PACKAGE: 'com.blueehr.bluetelemedlite',
+    ANDROID_APP_PACKAGE: 'com.yyy.xxx',
 
     /**
      * Override the behavior of some notifications to remain displayed until
