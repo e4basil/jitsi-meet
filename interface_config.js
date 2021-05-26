@@ -22,7 +22,7 @@ var interfaceConfig = {
      * Note: this mode is experimental and subject to breakage.
      */
     AUTO_PIN_LATEST_SCREEN_SHARE: 'remote-only',
-    BRAND_WATERMARK_LINK: 'https://meet.blueehr.com/images/be.png',
+    BRAND_WATERMARK_LINK: 'https://xxxxx.com/images/be.png',
 
     CLOSE_PAGE_GUEST_HINT: false, // A html text to be shown to guests on the close page, false disables it
     /**
@@ -53,9 +53,9 @@ var interfaceConfig = {
 
     DEFAULT_BACKGROUND: '#474747',
     DEFAULT_LOCAL_DISPLAY_NAME: 'me',
-    DEFAULT_LOGO_URL: 'https://meet.blueehr.com/images/be.png',
+    DEFAULT_LOGO_URL: 'https://xxxx.com/images/be.png',
     DEFAULT_REMOTE_DISPLAY_NAME: 'Friend',
-    DEFAULT_WELCOME_PAGE_LOGO_URL: 'https://meet.blueehr.com/images/be.png',
+    DEFAULT_WELCOME_PAGE_LOGO_URL: 'https://xxxx.com/images/be.png',
 
     DISABLE_DOMINANT_SPEAKER_INDICATOR: false,
 
@@ -117,7 +117,7 @@ var interfaceConfig = {
     HIDE_INVITE_MORE_HEADER: true,
 
     INITIAL_TOOLBAR_TIMEOUT: 20000,
-    JITSI_WATERMARK_LINK: 'https://meet.blueehr.com/images/be.png',
+    JITSI_WATERMARK_LINK: 'https://xxxxxx.com/images/be.png',
 
     LANG_DETECTION: true, // Allow i18n to detect the system language
     LIVE_STREAMING_HELP_LINK: 'https://jitsi.org/live', // Documentation reference for the live streaming feature.
@@ -143,19 +143,19 @@ var interfaceConfig = {
     /**
      * Specify custom URL for downloading android mobile app.
      */
-    MOBILE_DOWNLOAD_LINK_ANDROID: 'https://play.google.com/store/apps/details?id=com.blueehr.bluetelemedlite',
+    MOBILE_DOWNLOAD_LINK_ANDROID: 'https://play.google.com/store/apps/details?id=com.yyyy.xxxxx',
 
     /**
      * Specify custom URL for downloading f droid app.
      */
-    MOBILE_DOWNLOAD_LINK_F_DROID: 'https://f-droid.org/en/packages/com.blueehr.bluetelemedlite/',
+    MOBILE_DOWNLOAD_LINK_F_DROID: 'https://f-droid.org/en/packages/com.yyyy.xxxxx/',
 
     /**
      * Specify URL for downloading ios mobile app.
      */
     MOBILE_DOWNLOAD_LINK_IOS: 'https://itunes.apple.com/us/app/jitsi-meet/id1165103905',
 
-    NATIVE_APP_NAME: 'BlueTeleMedLite',
+    NATIVE_APP_NAME: 'Lite',
 
     // Names of browsers which should show a warning stating the current browser
     // has a suboptimal experience. Browsers which are not listed as optimal or
@@ -164,7 +164,7 @@ var interfaceConfig = {
     OPTIMAL_BROWSERS: [ 'chrome', 'chromium', 'firefox', 'nwjs', 'electron', 'safari' ],
 
     POLICY_LOGO: null,
-    PROVIDER_NAME: 'BlueEHR',
+    PROVIDER_NAME: 'testing',
 
     /**
      * If true, will display recent list
@@ -261,12 +261,12 @@ var interfaceConfig = {
     /**
      * Specify mobile app scheme for opening the app from the mobile browser.
      */
-    APP_SCHEME: 'com.blueehr.bluetelemedlite',
+    APP_SCHEME: 'com.yy.xxxx',
 
     /**
      * Specify the Android app package name.
      */
-    ANDROID_APP_PACKAGE: 'com.blueehr.bluetelemedlite',
+    ANDROID_APP_PACKAGE: 'com.yyy.xxx',
 
     /**
      * Override the behavior of some notifications to remain displayed until
