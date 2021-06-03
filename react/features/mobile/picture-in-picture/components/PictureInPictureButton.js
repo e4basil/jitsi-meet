@@ -72,7 +72,8 @@ function _mapStateToProps(state): Object {
     }
 
     return {
-        _enabled: enabled
+        // _enabled: enabled
+        _enabled: false
     };
 }
 
