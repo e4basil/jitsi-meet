@@ -316,8 +316,8 @@
         "userIdentifier": "使用者標識符",
         "userPassword": "用戶密碼",
         "videoLink": "影片連結",
-        "WaitForHostMsg": "此會議 <b>{{room}}</b>尚未啟動。如果您是會議主人，請進行認證；否則，請等待會議主人到達。",
-        "WaitForHostMsgWOk": "此會議 <b>{{room}}</b>尚未啟動。如果您是會議主人，請按 [確定] 進行認證；否則，請等待會議主人到達。",
+        "WaitForHostMsg": "此會議 <b>{{room}}</b> 尚未啟動。如果您是會議主人，請進行認證；否則，請等待會議主人到達。",
+        "WaitForHostMsgWOk": "此會議 <b>{{room}}</b> 尚未啟動。如果您是會議主人，請按 [確定] 進行認證；否則，請等待會議主人到達。",
         "WaitingForHost": "等侯主辦人...",
         "Yes": "是的",
         "yourEntireScreen": "您的畫面"

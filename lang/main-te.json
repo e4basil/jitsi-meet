@@ -320,8 +320,8 @@
         "userIdentifier": "వాడుకరి గుర్తింపు",
         "userPassword": "వాడుకరి సంకేతపదం",
         "videoLink": "వీడియో లంకె",
-        "WaitForHostMsg": "The conference<b>{{room}}</b> has not yet started. If you are the host then please authenticate. Otherwise, please wait for the host to arrive.",
-        "WaitForHostMsgWOk": "The conference<b>{{room}}</b> has not yet started. If you are the host then please press Ok to authenticate. Otherwise, please wait for the host to arrive.",
+        "WaitForHostMsg": "The conference <b>{{room}}</b> has not yet started. If you are the host then please authenticate. Otherwise, please wait for the host to arrive.",
+        "WaitForHostMsgWOk": "The conference <b>{{room}}</b> has not yet started. If you are the host then please press Ok to authenticate. Otherwise, please wait for the host to arrive.",
         "WaitingForHostTitle": "అతిథేయి కోసం వేచివున్నాం ...",
         "Yes": "అవును",
         "yourEntireScreen": "మీ పూర్తి తెర"

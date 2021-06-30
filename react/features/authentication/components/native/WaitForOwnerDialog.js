@@ -3,7 +3,7 @@
 import React, { Component } from 'react';
 import type { Dispatch } from 'redux';
 
-import { ConfirmDialog } from '../../../base/dialog';
+import { AlertDialog  } from '../../../base/dialog';
 import { translate } from '../../../base/i18n';
 import { connect } from '../../../base/redux';
 import { openLoginDialog, cancelWaitForOwner } from '../../actions.native';
@@ -66,18 +66,18 @@ class WaitForOwnerDialog extends Component<Props> {
         } = '';
 
         return (
-            <ConfirmDialog
+            <AlertDialog 
                 cancelKey = 'dialog.Cancel'
                 contentKey = {
                     {
-                        key: 'dialog.WaitForHostMsgWOk',
+                        key: 'dialog.WaitingForHostTitle',
                         // params: { room }
                         params: { empty }
                     }
                 }
-                okKey = 'dialog.Ok'
+                okKey = 'dialog.Cancel'
                 onCancel = { this._onCancel }
-                onSubmit = { this._onLogin } />
+                onSubmit = { this._onCancel } />
         );
     }
 

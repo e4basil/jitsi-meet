@@ -155,8 +155,8 @@
         "Remove": "Odstrani",
         "Share": "Deli",
         "Submit": "Pošlji",
-        "WaitForHostMsg": "Konferenca v sobi<b>{{room}}</b> se še ni začela. Če ste gostitelj, se prosimo prijavite, sicer pa počakajte na gostitelja srečanja.",
-        "WaitForHostMsgWOk": "Konferenca v sobi<b>{{room}}</b> se še ni začela. Če ste gostitelj, prisisnite OK in se prijavite, sicer pa počakajte na gostitelja srečanja.",
+        "WaitForHostMsg": "Konferenca v sobi <b>{{room}}</b> se še ni začela. Če ste gostitelj, se prosimo prijavite, sicer pa počakajte na gostitelja srečanja.",
+        "WaitForHostMsgWOk": "Konferenca v sobi <b>{{room}}</b> se še ni začela. Če ste gostitelj, prisisnite OK in se prijavite, sicer pa počakajte na gostitelja srečanja.",
         "WaitingForHost": "Čakanje na gostitelja...",
         "Yes": "Da",
         "accessibilityLabel": {

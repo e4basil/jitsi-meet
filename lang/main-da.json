@@ -279,8 +279,8 @@
         "transcribing": "Transskribering",
         "unlockRoom": "Fjern mødeadgangskode",
         "userPassword": "Brugeradgangskode",
-        "WaitForHostMsg": "Mødet<b>{{room}}</b> er ikke startet endnu. Hvis du er værten, log venligst ind. Ellers vent på at værten kommer",
-        "WaitForHostMsgWOk": "Mødet<b>{{room}}</b> er ikke startet endnu. Hvis du er værten, tryk venligst på OK for at logge ind. Ellers vent på at værten kommer.",
+        "WaitForHostMsg": "Mødet <b>{{room}}</b> er ikke startet endnu. Hvis du er værten, log venligst ind. Ellers vent på at værten kommer",
+        "WaitForHostMsgWOk": "Mødet <b>{{room}}</b> er ikke startet endnu. Hvis du er værten, tryk venligst på OK for at logge ind. Ellers vent på at værten kommer.",
         "WaitingForHost": "Venter på vært …",
         "Yes": "Ja",
         "yourEntireScreen": "Hele din skærm"

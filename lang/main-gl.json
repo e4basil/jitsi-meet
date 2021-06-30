@@ -267,8 +267,8 @@
         "transcribing": "Transcribindo",
         "unlockRoom": "Retirar a reunión $t(lockRoomPassword)",
         "userPassword": "contrasinal do usuario",
-        "WaitForHostMsg": "A sala<b>{{room}}</b> aínda non comezou. Se vostede é o anfitrión, autentíquese. Se non, agarde a que o anfitrión chegue.",
-        "WaitForHostMsgWOk": "A sala<b>{{room}}</b> aínda non comezou. Se vostede é o anfitrión, prema en Aceptar para autenticar. Se non, agarde a que o anfitrión chegue.",
+        "WaitForHostMsg": "A sala <b>{{room}}</b> aínda non comezou. Se vostede é o anfitrión, autentíquese. Se non, agarde a que o anfitrión chegue.",
+        "WaitForHostMsgWOk": "A sala <b>{{room}}</b> aínda non comezou. Se vostede é o anfitrión, prema en Aceptar para autenticar. Se non, agarde a que o anfitrión chegue.",
         "WaitingForHost": "Agardando polo anfitrión…",
         "Yes": "Si",
         "yourEntireScreen": "A pantalla completa"
