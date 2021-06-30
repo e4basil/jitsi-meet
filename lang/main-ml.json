@@ -300,8 +300,8 @@
         "transcribing": "ട്രാൻസ്‌ക്രൈബുചെയ്യുന്നു",
         "unlockRoom": "Remove meeting $t(lockRoomPassword)",
         "userPassword": "ഉപയോക്തൃ പാസ്‌വേഡ്",
-        "WaitForHostMsg": "This conference<b>{{room}}</b> has not yet started. If you are the host then please authenticate. Otherwise, please wait for the host to arrive.",
-        "WaitForHostMsgWOk": "This conference<b>{{room}}</b> has not yet started. If you are the host then please press Ok to authenticate. Otherwise, please wait for the host to arrive.",
+        "WaitForHostMsg": "This conference <b>{{room}}</b> has not yet started. If you are the host then please authenticate. Otherwise, please wait for the host to arrive.",
+        "WaitForHostMsgWOk": "This conference <b>{{room}}</b> has not yet started. If you are the host then please press Ok to authenticate. Otherwise, please wait for the host to arrive.",
         "WaitingForHost": "ഹോസ്റ്റിനായി കാത്തിരിക്കുന്നു ...",
         "Yes": "അതെ",
         "yourEntireScreen": "നിങ്ങളുടെ മുഴുവൻ സ്ക്രീനും "

@@ -252,8 +252,8 @@
         "transcribing": "Đang phiên âm",
         "unlockRoom": "",
         "userPassword": "mật khẩu người dùng",
-        "WaitForHostMsg": "Cuộc họp<b>{{room}}</b> chưa được khởi tạo. Nếu bạn là chủ nghị vui lòng xác thực. Nếu không, vui lòng đợi chủ nghị.",
-        "WaitForHostMsgWOk": "Cuộc họp<b>{{room}}</b> chưa được khởi tạo. Nếu bạn là chủ nghị vui lòng nhấn OK để xác thực. Nếu không, vui lòng đợi chủ nghị.",
+        "WaitForHostMsg": "Cuộc họp <b>{{room}}</b> chưa được khởi tạo. Nếu bạn là chủ nghị vui lòng xác thực. Nếu không, vui lòng đợi chủ nghị.",
+        "WaitForHostMsgWOk": "Cuộc họp <b>{{room}}</b> chưa được khởi tạo. Nếu bạn là chủ nghị vui lòng nhấn OK để xác thực. Nếu không, vui lòng đợi chủ nghị.",
         "WaitingForHost": "Đang đợi chủ nghị …",
         "Yes": "Có",
         "yourEntireScreen": "Toàn bộ màn hình của bạn"

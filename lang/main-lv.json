@@ -272,8 +272,8 @@
         "transcribing": "Notiek transkripcija/pārrakstīšana",
         "unlockRoom": "Noņemt $t(lockRoomPassword)",
         "userPassword": "lietotāja parole",
-        "WaitForHostMsg": "Sapulce<b>{{room}}</b> vēl nav sākusies. Ja esat sapulces rīkotājs, lūdzu autorizējaties. Ja nē, sagaidiet rīkotāju.",
-        "WaitForHostMsgWOk": "Sapulce<b>{{room}}</b> vēl nav sākusies. Ja esat sapulces rīkotājs, lūdzu nospiediet |Ok|, lai autentificētos. Ja nē, sagaidiet rīkotāju.",
+        "WaitForHostMsg": "Sapulce <b>{{room}}</b> vēl nav sākusies. Ja esat sapulces rīkotājs, lūdzu autorizējaties. Ja nē, sagaidiet rīkotāju.",
+        "WaitForHostMsgWOk": "Sapulce <b>{{room}}</b> vēl nav sākusies. Ja esat sapulces rīkotājs, lūdzu nospiediet |Ok|, lai autentificētos. Ja nē, sagaidiet rīkotāju.",
         "WaitingForHost": "Gaidām rīkotāju...",
         "Yes": "Jā",
         "yourEntireScreen": "Visu Jūsu ekrānu"
