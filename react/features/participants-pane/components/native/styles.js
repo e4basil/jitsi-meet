@@ -116,10 +116,6 @@ export default {
         textTransform: 'capitalize'
     },
 
-    admitAllParticipantsActionButton: {
-        marginLeft: 'auto'
-    },
-
     participantContainer: {
         alignItems: 'center',
         borderBottomColor: BaseTheme.palette.field01Hover,
@@ -145,7 +141,7 @@ export default {
         display: 'flex',
         flexDirection: 'row',
         overflow: 'hidden',
-        paddingLeft: BaseTheme.spacing[2],
+        paddingLeft: BaseTheme.spacing[3],
         width: '63%'
     },
 
@@ -187,6 +183,7 @@ export default {
         ...flexContent,
         top: BaseTheme.spacing[1]
     },
+
     lobbyList: {
         position: 'relative'
     },
@@ -277,12 +274,7 @@ export default {
     },
 
     contextMenuMore: {
-        backgroundColor: BaseTheme.palette.action02,
-        borderRadius: BaseTheme.shape.borderRadius
-    },
-
-    contextMenuMeetingParticipantDetails: {
-        backgroundColor: BaseTheme.palette.action02,
+        backgroundColor: BaseTheme.palette.bottomSheet,
         borderRadius: BaseTheme.shape.borderRadius
     },
 
@@ -303,8 +295,6 @@ export default {
         marginHorizontal: BaseTheme.spacing[0],
         paddingTop: 12,
         paddingBottom: 12,
-        paddingRight: BaseTheme.spacing[3],
-        paddingLeft: BaseTheme.spacing[3],
         textTransform: 'capitalize',
         width: 94
     },
@@ -318,13 +308,15 @@ export default {
     },
 
     contextMenuItemSectionAvatar: {
-        ...contextMenuItem,
-        marginLeft: BaseTheme.spacing[3]
-    },
-
-    contextMenuItemAvatarText: {
-        ...contextMenuItemText,
-        marginLeft: BaseTheme.spacing[3]
+        alignItems: 'center',
+        backgroundColor: BaseTheme.palette.bottomSheet,
+        borderBottomColor: BaseTheme.palette.dividerColor,
+        borderBottomWidth: 1,
+        borderTopLeftRadius: BaseTheme.spacing[3],
+        borderTopRightRadius: BaseTheme.spacing[3],
+        flexDirection: 'row',
+        height: BaseTheme.spacing[7],
+        paddingLeft: BaseTheme.spacing[3]
     },
 
     contextMenuItemText: {
@@ -333,15 +325,14 @@ export default {
     },
 
     contextMenuItemName: {
-        ...BaseTheme.typography.bodyShortRegularLarge,
-        color: BaseTheme.palette.text01
-    },
-
-    contextMenuIcon: {
-        color: BaseTheme.palette.actionDanger
+        color: BaseTheme.palette.text04,
+        flexShrink: 1,
+        fontSize: BaseTheme.spacing[3],
+        marginLeft: BaseTheme.spacing[3],
+        opacity: 0.90
     },
 
     divider: {
-        backgroundColor: BaseTheme.palette.section01
+        backgroundColor: BaseTheme.palette.dividerColor
     }
 };
