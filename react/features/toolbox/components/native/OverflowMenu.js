@@ -1,6 +1,7 @@
 // @flow
 
 import React, { PureComponent } from 'react';
+import { Divider } from 'react-native-paper';
 
 import { ColorSchemeRegistry } from '../../../base/color-scheme';
 import { BottomSheet, hideDialog, isDialogOpen } from '../../../base/dialog';
@@ -16,6 +17,7 @@ import SecurityDialogButton from '../../../security/components/security-dialog/S
 import { SharedVideoButton } from '../../../shared-video/components';
 import { ClosedCaptionButton } from '../../../subtitles';
 import { TileViewButton } from '../../../video-layout';
+import styles from '../../../video-menu/components/native/styles';
 import { getMovableButtons } from '../../functions.native';
 import HelpButton from '../HelpButton';
 import MuteEveryoneButton from '../MuteEveryoneButton';
@@ -136,21 +138,24 @@ class OverflowMenu extends PureComponent<Props, State> {
                 renderFooter = { _reactionsEnabled && !toolbarButtons.has('raisehand')
                     ? this._renderReactionMenu
                     : null }>
-                <AudioRouteButton { ...topButtonProps } />
-                <ParticipantsPaneButton { ...buttonProps } />
+                {/* <AudioRouteButton { ...topButtonProps } /> */}
+                {/* <ParticipantsPaneButton { ...buttonProps } /> */}
                 <AudioOnlyButton { ...buttonProps } />
                 {/* {!_reactionsEnabled && !toolbarButtons.has('raisehand') && <RaiseHandButton { ...buttonProps } />} */}
+                {/* <Divider style = { styles.divider } /> */}
                 {/* <SecurityDialogButton { ...buttonProps } /> */}
+                {/* <RecordButton { ...buttonProps } /> */}
+                {/* <LiveStreamButton { ...buttonProps } /> */}
+                {/* <MuteEveryoneButton { ...buttonProps } /> */}
+                {/* <MuteEveryonesVideoButton { ...buttonProps } /> */}
+                {/* <Divider style = { styles.divider } /> */}
+                {/* <SharedVideoButton { ...buttonProps } /> */}
                 {/* <ScreenSharingButton { ...buttonProps } /> */}
                 {!toolbarButtons.has('togglecamera') && <ToggleCameraButton { ...buttonProps } />}
                 {!toolbarButtons.has('tileview') && <TileViewButton { ...buttonProps } />}
-                {/* <RecordButton { ...buttonProps } /> */}
-                {/* <LiveStreamButton { ...buttonProps } /> */}
-                {/* <SharedVideoButton { ...buttonProps } /> */}
+                {/* <Divider style = { styles.divider } /> */}
                 {/* <ClosedCaptionButton { ...buttonProps } /> */}
                 {/* <SharedDocumentButton { ...buttonProps } /> */}
-                {/* <MuteEveryoneButton { ...buttonProps } /> */}
-                {/* <MuteEveryonesVideoButton { ...buttonProps } /> */}
                 {/* <HelpButton { ...buttonProps } /> */}
             </BottomSheet>
         );
