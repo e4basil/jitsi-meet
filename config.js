@@ -73,6 +73,9 @@ var config = {
     // Enables reactions feature.
     // enableReactions: false,
 
+    // Disables polls feature.
+    // disablePolls: false,
+
     // Disables ICE/UDP by filtering out local and remote UDP candidates in
     // signalling.
     // webrtcIceUdpDisable: false,
@@ -143,6 +146,9 @@ var config = {
 
     // Sets the preferred resolution (height) for local video. Defaults to 720.
     // resolution: 720,
+
+    // Specifies whether there will be a search field in speaker stats or not
+    // disableSpeakerStatsSearch: false,
 
     // How many participants while in the tile view mode, before the receiving video quality is reduced from HD to SD.
     // Use -1 to disable.
@@ -594,6 +600,9 @@ var config = {
     },
 
     analytics: {
+        // True if the analytics should be disabled
+        // disabled: false,
+
         // The Google Analytics Tracking ID:
         // googleAnalyticsTrackingId: 'your-tracking-id-UA-123456-1'
 
