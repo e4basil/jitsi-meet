@@ -6,31 +6,56 @@ import { setRemoteParticipants } from './actions';
  * Computes the reorderd list of the remote participants.
  *
  * @param {*} store - The redux store.
+ * @param {string} participantId - The endpoint id of the participant that joined the call.
  * @returns {void}
  * @private
  */
-export function updateRemoteParticipants(store: Object) {
+export function updateRemoteParticipants(store: Object, participantId: ?number) {
     const state = store.getState();
-    const { fakeParticipants, sortedRemoteParticipants, speakersList } = state['features/base/participants'];
-    const { remoteScreenShares } = state['features/video-layout'];
-    const screenShares = (remoteScreenShares || []).slice();
-    let speakers = (speakersList || []).slice();
-    const remoteParticipants = new Map(sortedRemoteParticipants);
-    const sharedVideos = fakeParticipants ? Array.from(fakeParticipants.keys()) : [];
+    const { enableThumbnailReordering = true } = state['features/base/config'];
+    let reorderedParticipants = [];
 
-    for (const screenshare of screenShares) {
+    if (!enableThumbnailReordering) {
+        if (participantId) {
+            const { remoteParticipants } = state['features/filmstrip'];
+
+            reorderedParticipants = [ ...remoteParticipants, participantId ];
+            store.dispatch(setRemoteParticipants(reorderedParticipants));
+        }
+
+        return;
+    }
+
+    const {
+        fakeParticipants,
+        sortedRemoteParticipants,
+        sortedRemoteScreenshares,
+        speakersList
+    } = state['features/base/participants'];
+    const remoteParticipants = new Map(sortedRemoteParticipants);
+    const screenShares = new Map(sortedRemoteScreenshares);
+    const sharedVideos = fakeParticipants ? Array.from(fakeParticipants.keys()) : [];
+    const speakers = new Map(speakersList);
+
+    for (const screenshare of screenShares.keys()) {
         remoteParticipants.delete(screenshare);
-        speakers = speakers.filter(speaker => speaker !== screenshare);
+        speakers.delete(screenshare);
     }
     for (const sharedVideo of sharedVideos) {
         remoteParticipants.delete(sharedVideo);
-        speakers = speakers.filter(speaker => speaker !== sharedVideo);
+        speakers.delete(sharedVideo);
     }
-    for (const speaker of speakers) {
+    for (const speaker of speakers.keys()) {
         remoteParticipants.delete(speaker);
     }
-    const reorderedParticipants
-        = [ ...screenShares.reverse(), ...sharedVideos, ...speakers, ...Array.from(remoteParticipants.keys()) ];
+
+    // Always update the order of the thumnails.
+    reorderedParticipants = [
+        ...Array.from(screenShares.keys()),
+        ...sharedVideos,
+        ...Array.from(speakers.keys()),
+        ...Array.from(remoteParticipants.keys())
+    ];
 
     store.dispatch(setRemoteParticipants(reorderedParticipants));
 }
