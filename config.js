@@ -320,7 +320,7 @@ var config = {
     //          VP9: {
     //              low: 100000,
     //              standard: 300000,
-    //              high:  1200000
+    //              high: 1200000
     //          }
     //    },
     //
@@ -859,6 +859,7 @@ var config = {
      disableRemoteControl
      displayJids
      externalConnectUrl
+     e2eeLabel
      firefox_fake_device
      googleApiApplicationClientID
      iAmRecorder
