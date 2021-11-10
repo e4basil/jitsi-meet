@@ -126,7 +126,7 @@ type State = AbstractState & {
  * Implements a React {@link Component} which displays the current connection
  * quality percentage and has a popover to show more detailed connection stats.
  *
- * @extends {Component}
+ * @augments {Component}
  */
 class ConnectionIndicator extends AbstractConnectionIndicator<Props, State> {
     /**
@@ -313,41 +313,41 @@ class ConnectionIndicator extends AbstractConnectionIndicator<Props, State> {
         ];
     }
 
-  _onShowPopover: () => void;
+    _onShowPopover: () => void;
 
-  /**
+    /**
      * Shows popover.
      *
      * @private
      * @returns {void}
      */
-  _onShowPopover() {
-      this.setState({ popoverVisible: true });
-  }
+    _onShowPopover() {
+        this.setState({ popoverVisible: true });
+    }
 
 
-  /**
+    /**
      * Creates a ReactElement for displaying the indicator (GSM bar).
      *
      * @returns {ReactElement}
      */
-  _renderIndicator() {
-      const colorClass = this._getConnectionColorClass();
-      const indicatorContainerClassNames
+    _renderIndicator() {
+        const colorClass = this._getConnectionColorClass();
+        const indicatorContainerClassNames
               = `connection-indicator indicator ${colorClass}`;
 
-      return (
-          <div className = 'popover-trigger'>
-              <div
-                  className = { indicatorContainerClassNames }
-                  style = {{ fontSize: this.props.iconSize }}>
-                  <div className = 'connection indicatoricon'>
-                      { this._renderIcon() }
-                  </div>
-              </div>
-          </div>
-      );
-  }
+        return (
+            <div className = 'popover-trigger'>
+                <div
+                    className = { indicatorContainerClassNames }
+                    style = {{ fontSize: this.props.iconSize }}>
+                    <div className = 'connection indicatoricon'>
+                        { this._renderIcon() }
+                    </div>
+                </div>
+            </div>
+        );
+    }
 }
 
 /**
@@ -365,7 +365,7 @@ export function _mapStateToProps(state: Object, ownProps: Props) {
     return {
         _connectionIndicatorInactiveDisabled:
         Boolean(state['features/base/config'].connectionIndicators?.inactiveDisabled),
-        _popoverDisabled: state['features/base/config'].disableConnectionIndicatorDetails,
+        _popoverDisabled: state['features/base/config'].connectionIndicators?.disableDetails,
         _connectionStatus: participant?.connectionStatus
     };
 }
