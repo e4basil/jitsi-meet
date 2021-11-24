@@ -150,8 +150,8 @@ public class MainActivity extends JitsiMeetActivity {
         // Set default options
         JitsiMeetConferenceOptions defaultOptions
             = new JitsiMeetConferenceOptions.Builder()
-            .setWelcomePageEnabled(true)
             .setServerURL(buildURL(defaultURL))
+            .setFeatureFlag("welcomepage.enabled", true)
             .setFeatureFlag("resolution", 360)
             .setFeatureFlag("add-people.enabled", false)
             .setFeatureFlag("calendar.enabled", false)
@@ -254,5 +254,5 @@ public class MainActivity extends JitsiMeetActivity {
         } catch (MalformedURLException e) {
             return null;
         }
-    }
+    }git pull https://github.com/jitsi/jitsi-meet.git master
 }
