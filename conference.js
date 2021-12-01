@@ -9,6 +9,7 @@ import { ENDPOINT_TEXT_MESSAGE_NAME } from './modules/API/constants';
 import { AUDIO_ONLY_SCREEN_SHARE_NO_TRACK } from './modules/UI/UIErrors';
 import AuthHandler from './modules/UI/authentication/AuthHandler';
 import UIUtil from './modules/UI/util/UIUtil';
+import VideoLayout from './modules/UI/videolayout/VideoLayout';
 import mediaDeviceHelper from './modules/devices/mediaDeviceHelper';
 import Recorder from './modules/recorder/Recorder';
 import { createTaskQueue } from './modules/util/helpers';
@@ -75,18 +76,21 @@ import {
 import {
     getStartWithAudioMuted,
     getStartWithVideoMuted,
+    isAudioMuted,
+    isVideoMuted,
     isVideoMutedByUser,
     MEDIA_TYPE,
     setAudioAvailable,
     setAudioMuted,
+    setAudioUnmutePermissions,
     setVideoAvailable,
-    setVideoMuted
+    setVideoMuted,
+    setVideoUnmutePermissions
 } from './react/features/base/media';
 import {
     dominantSpeakerChanged,
     getLocalParticipant,
     getNormalizedDisplayName,
-    getParticipantById,
     localParticipantConnectionStatusChanged,
     localParticipantRoleChanged,
     participantConnectionStatusChanged,
@@ -233,17 +237,6 @@ function sendData(command, value) {
 
     room.removeCommand(command);
     room.sendCommand(command, { value });
-}
-
-/**
- * Get user nickname by user id.
- * @param {string} id user id
- * @returns {string?} user nickname or undefined if user is unknown.
- */
-function getDisplayName(id) {
-    const participant = getParticipantById(APP.store.getState(), id);
-
-    return participant && participant.name;
 }
 
 /**
@@ -1219,14 +1212,6 @@ export default {
     },
 
     /**
-     * Obtains the local display name.
-     * @returns {string|undefined}
-     */
-    getLocalDisplayName() {
-        return getDisplayName(this.getMyUserId());
-    },
-
-    /**
      * Finds JitsiParticipant for given id.
      *
      * @param {string} id participant's identifier(MUC nickname).
@@ -1236,29 +1221,6 @@ export default {
      */
     getParticipantById(id) {
         return room ? room.getParticipantById(id) : null;
-    },
-
-    /**
-     * Gets the display name foe the <tt>JitsiParticipant</tt> identified by
-     * the given <tt>id</tt>.
-     *
-     * @param id {string} the participant's id(MUC nickname/JVB endpoint id)
-     *
-     * @return {string} the participant's display name or the default string if
-     * absent.
-     */
-    getParticipantDisplayName(id) {
-        const displayName = getDisplayName(id);
-
-        if (displayName) {
-            return displayName;
-        }
-        if (APP.conference.isLocalId(id)) {
-            return APP.translation.generateTranslationHTML(
-                    interfaceConfig.DEFAULT_LOCAL_DISPLAY_NAME);
-        }
-
-        return interfaceConfig.DEFAULT_REMOTE_DISPLAY_NAME;
     },
 
     getMyUserId() {
@@ -1371,7 +1333,15 @@ export default {
     /**
      * Used by the Breakout Rooms feature to join a breakout room or go back to the main room.
      */
-    async joinRoom(roomName, isBreakoutRoom = false) {
+    async joinRoom(roomName) {
+        // Reset VideoLayout. It's destroyed in features/video-layout/middleware.web.js so re-initialize it.
+        VideoLayout.initLargeVideo();
+        VideoLayout.resizeVideoArea();
+
+        // Destroy old tracks.
+        APP.store.dispatch(destroyLocalTracks());
+        this._localTracksInitialized = false;
+
         this.roomName = roomName;
 
         const { tryCreateLocalTracks, errors } = this.createInitialLocalTracks();
@@ -1384,33 +1354,15 @@ export default {
                 track.mute();
             }
         });
-        this._createRoom(localTracks, isBreakoutRoom);
+        this._createRoom(localTracks);
 
         return new Promise((resolve, reject) => {
             new ConferenceConnector(resolve, reject).connect();
         });
     },
 
-    _createRoom(localTracks, isBreakoutRoom = false) {
-        const extraOptions = {};
-
-        if (isBreakoutRoom) {
-            // We must be in a room already.
-            if (!room?.xmpp?.breakoutRoomsComponentAddress) {
-                throw new Error('Breakout Rooms not enabled');
-            }
-
-            // TODO: re-evaluate this. -saghul
-            extraOptions.customDomain = room.xmpp.breakoutRoomsComponentAddress;
-        }
-
-        room
-            = connection.initJitsiConference(
-                APP.conference.roomName,
-                {
-                    ...this._getConferenceOptions(),
-                    ...extraOptions
-                });
+    _createRoom(localTracks) {
+        room = connection.initJitsiConference(APP.conference.roomName, this._getConferenceOptions());
 
         // Filter out the tracks that are muted (except on Safari).
         const tracks = browser.isWebKitBased() ? localTracks : localTracks.filter(track => !track.isMuted());
@@ -2222,6 +2174,10 @@ export default {
             (id, displayName) => {
                 const formattedDisplayName
                     = getNormalizedDisplayName(displayName);
+                const state = APP.store.getState();
+                const {
+                    defaultRemoteDisplayName
+                } = state['features/base/config'];
 
                 APP.store.dispatch(participantUpdated({
                     conference: room,
@@ -2233,7 +2189,7 @@ export default {
                     formattedDisplayName:
                         appendSuffix(
                             formattedDisplayName
-                                || interfaceConfig.DEFAULT_REMOTE_DISPLAY_NAME)
+                                || defaultRemoteDisplayName)
                 });
             }
         );
@@ -2304,6 +2260,27 @@ export default {
         room.on(JitsiConferenceEvents.SUSPEND_DETECTED, () => {
             APP.store.dispatch(suspendDetected());
         });
+
+        room.on(
+            JitsiConferenceEvents.AUDIO_UNMUTE_PERMISSIONS_CHANGED,
+            disableAudioMuteChange => {
+                const muted = isAudioMuted(APP.store.getState());
+
+                // Disable the mute button only if its muted.
+                if (!disableAudioMuteChange || (disableAudioMuteChange && muted)) {
+                    APP.store.dispatch(setAudioUnmutePermissions(disableAudioMuteChange));
+                }
+            });
+        room.on(
+            JitsiConferenceEvents.VIDEO_UNMUTE_PERMISSIONS_CHANGED,
+            disableVideoMuteChange => {
+                const muted = isVideoMuted(APP.store.getState());
+
+                // Disable the mute button only if its muted.
+                if (!disableVideoMuteChange || (disableVideoMuteChange && muted)) {
+                    APP.store.dispatch(setVideoUnmutePermissions(disableVideoMuteChange));
+                }
+            });
 
         APP.UI.addListener(UIEvents.AUDIO_MUTED, muted => {
             this.muteAudio(muted);
@@ -2941,7 +2918,7 @@ export default {
 
         Promise.all([
             requestFeedbackPromise,
-            this.leaveRoomAndDisconnect()
+            this.leaveRoom()
         ])
         .then(values => {
             this._room = undefined;
@@ -2962,27 +2939,23 @@ export default {
     /**
      * Leaves the room.
      *
+     * @param {boolean} doDisconnect - Wether leaving the room should also terminate the connection.
      * @returns {Promise}
      */
-    leaveRoom() {
-        if (room && room.isJoined()) {
-            return room.leave();
-        }
-    },
-
-    /**
-     * Leaves the room and calls JitsiConnection.disconnect.
-     *
-     * @returns {Promise}
-     */
-    leaveRoomAndDisconnect() {
+    leaveRoom(doDisconnect = true) {
         APP.store.dispatch(conferenceWillLeave(room));
 
         if (room && room.isJoined()) {
-            return room.leave().then(disconnect, disconnect);
+            return room.leave().finally(() => {
+                if (doDisconnect) {
+                    return disconnect();
+                }
+            });
         }
 
-        return disconnect();
+        if (doDisconnect) {
+            return disconnect();
+        }
     },
 
     /**

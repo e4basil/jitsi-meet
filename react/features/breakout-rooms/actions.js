@@ -15,6 +15,8 @@ import { setAudioMuted, setVideoMuted } from '../base/media';
 import { getRemoteParticipants } from '../base/participants';
 import { clearNotifications } from '../notifications';
 
+import { _RESET_BREAKOUT_ROOMS, _UPDATE_ROOM_COUNTER } from './actionTypes';
+import { FEATURE_KEY } from './constants';
 import {
     getBreakoutRooms,
     getMainRoom
@@ -31,16 +33,19 @@ declare var APP: Object;
  */
 export function createBreakoutRoom(name?: string) {
     return (dispatch: Dispatch<any>, getState: Function) => {
-        const rooms = getBreakoutRooms(getState);
-
-        // TODO: remove this once we add UI to customize the name.
-        const index = Object.keys(rooms).length;
-        const subject = name || i18next.t('breakoutRooms.defaultName', { index });
+        const state = getState();
+        let { roomCounter } = state[FEATURE_KEY];
+        const subject = name || i18next.t('breakoutRooms.defaultName', { index: ++roomCounter });
 
         sendAnalytics(createBreakoutRoomsEvent('create'));
 
+        dispatch({
+            type: _UPDATE_ROOM_COUNTER,
+            roomCounter
+        });
+
         // $FlowExpectedError
-        getCurrentConference(getState)?.getBreakoutRooms()
+        getCurrentConference(state)?.getBreakoutRooms()
             ?.createBreakoutRoom(subject);
     };
 }
@@ -170,6 +175,10 @@ export function moveToRoom(roomId?: string) {
             _roomId.domain = domainParts.join('@');
         }
 
+        dispatch({
+            type: _RESET_BREAKOUT_ROOMS
+        });
+
         if (navigator.product === 'ReactNative') {
             const conference = getCurrentConference(getState);
             const { audio, video } = getState()['features/base/media'];
@@ -190,7 +199,7 @@ export function moveToRoom(roomId?: string) {
             dispatch(setAudioMuted(audio.muted));
             dispatch(setVideoMuted(video.muted));
         } else {
-            APP.conference.leaveRoom()
+            APP.conference.leaveRoom(false /* doDisconnect */)
                 .finally(() => APP.conference.joinRoom(_roomId));
         }
     };

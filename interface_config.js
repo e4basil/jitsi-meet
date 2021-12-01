@@ -27,10 +27,8 @@ var interfaceConfig = {
     CLOSE_PAGE_GUEST_HINT: false, // A html text to be shown to guests on the close page, false disables it
 
     DEFAULT_BACKGROUND: '#474747',
-    DEFAULT_LOCAL_DISPLAY_NAME: 'me',
-    DEFAULT_LOGO_URL: 'https://xxxx.com/images/be.png',
-    DEFAULT_REMOTE_DISPLAY_NAME: 'Friend',
-    DEFAULT_WELCOME_PAGE_LOGO_URL: 'https://xxxx.com/images/be.png',
+    DEFAULT_LOGO_URL: 'images/watermark.svg',
+    DEFAULT_WELCOME_PAGE_LOGO_URL: 'images/watermark.svg',
 
     DISABLE_DOMINANT_SPEAKER_INDICATOR: false,
 
@@ -224,7 +222,7 @@ var interfaceConfig = {
     /**
      * Specify the Android app package name.
      */
-    ANDROID_APP_PACKAGE: 'com.yyy.xxx',
+    // ANDROID_APP_PACKAGE: 'org.jitsi.meet',
 
     // List of undocumented settings
     /**
@@ -241,6 +239,12 @@ var interfaceConfig = {
 
     // Please use disableModeratorIndicator from config.js
     // DISABLE_FOCUS_INDICATOR: false,
+
+    // Please use defaultLocalDisplayName from config.js
+    // DEFAULT_LOCAL_DISPLAY_NAME: 'me',
+
+    // Please use defaultRemoteDisplayName from config.js
+    // DEFAULT_REMOTE_DISPLAY_NAME: 'Fellow Jitster',
 
     // Moved to config.js as `toolbarConfig.initialTimeout`.
     // INITIAL_TOOLBAR_TIMEOUT: 20000,
