@@ -99,7 +99,7 @@ export function getMoreTabProps(stateful: Object | Function) {
         languages: LANGUAGES,
         showLanguageSettings: configuredTabs.includes('language'),
         showPrejoinPage: !state['features/base/settings'].userSelectedSkipPrejoin,
-        showPrejoinSettings: state['features/base/config'].prejoinPageEnabled
+        showPrejoinSettings: state['features/base/config'].prejoinConfig?.enabled
     };
 }
 
@@ -156,11 +156,13 @@ export function getProfileTabProps(stateful: Object | Function) {
         conference
     } = state['features/base/conference'];
     const localParticipant = getLocalParticipant(state);
+    const { disableSelfView } = state['features/base/settings'];
 
     return {
         authEnabled: Boolean(conference && authEnabled),
         authLogin,
         displayName: localParticipant.name,
+        disableSelfView: Boolean(disableSelfView),
         email: localParticipant.email,
         readOnlyName: isNameReadOnly(state)
     };
