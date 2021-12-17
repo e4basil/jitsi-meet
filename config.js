@@ -74,6 +74,12 @@ var config = {
         // callStatsThreshold: 5 // enable callstats for 5% of the users.
     },
 
+    // Feature Flags.
+    flags: {
+        // Enables source names in the signaling.
+        // sourceNameSignaling: false,
+    },
+
     // Disables moderator indicators.
     // disableModeratorIndicator: false,
 
@@ -88,6 +94,9 @@ var config = {
 
     // Disables self-view tile. (hides it from tile view and from filmstrip)
     // disableSelfView: false,
+
+    // Disables self-view settings in UI
+    // disableSelfViewSettings: false,
 
     // Disables ICE/UDP by filtering out local and remote UDP candidates in
     // signalling.
