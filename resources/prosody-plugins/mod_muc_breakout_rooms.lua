@@ -114,7 +114,7 @@ function get_participants(room)
 end
 
 function broadcast_breakout_rooms(room_jid)
-    local main_room, main_room_jid = get_main_room(room_jid);
+    local main_room = get_main_room(room_jid);
 
     if not main_room or main_room._data.is_broadcast_breakout_scheduled then
         return;
@@ -125,6 +125,11 @@ function broadcast_breakout_rooms(room_jid)
     main_room:save(true);
     module:add_timer(BROADCAST_ROOMS_INTERVAL, function()
         local main_room, main_room_jid = get_main_room(room_jid);
+
+        if not main_room then
+            return;
+        end
+
         main_room._data.is_broadcast_breakout_scheduled = false;
         main_room:save(true);
 
@@ -208,7 +213,7 @@ end
 function destroy_breakout_room(room_jid, message)
     local main_room, main_room_jid = get_main_room(room_jid);
 
-    if room_jid == main_room_jid then
+    if room_jid == main_room_jid or not main_room then
         return;
     end
 
@@ -334,7 +339,7 @@ function on_occupant_joined(event)
 
     local main_room = get_main_room(room.jid);
 
-    if main_room._data.breakout_rooms_active then
+    if main_room and main_room._data.breakout_rooms_active then
         if jid_node(event.occupant.jid) ~= 'focus' then
             broadcast_breakout_rooms(room.jid);
         end
@@ -383,6 +388,10 @@ function on_occupant_left(event)
 
     local main_room = get_main_room(room_jid);
 
+    if not main_room then
+        return;
+    end
+
     if main_room._data.breakout_rooms_active and jid_node(event.occupant.jid) ~= 'focus' then
         broadcast_breakout_rooms(room_jid);
     end
@@ -395,7 +404,7 @@ function on_occupant_left(event)
             -- we need to look up again the room as till the timer is fired, the room maybe already destroyed/recreated
             -- and we will have the old instance
             local main_room, main_room_jid = get_main_room(room_jid);
-            if main_room._data.is_close_all_scheduled then
+            if main_room and main_room._data.is_close_all_scheduled then
                 module:log('info', 'Closing conference %s as all left for good.', main_room_jid);
                 main_room:set_persistent(false);
                 main_room:destroy(nil, 'All occupants left.');
@@ -472,7 +481,7 @@ function process_breakout_rooms_muc_loaded(breakout_rooms_muc, host_module)
         event.formdata['muc#roominfo_breakout_main_room'] = main_room_jid;
 
         -- If the main room has a lobby, make it so this breakout room also uses it.
-        if (main_room._data.lobbyroom and main_room:get_members_only()) then
+        if (main_room and main_room._data.lobbyroom and main_room:get_members_only()) then
             table.insert(event.form, {
                 name = 'muc#roominfo_lobbyroom';
                 label = 'Lobby room jid';

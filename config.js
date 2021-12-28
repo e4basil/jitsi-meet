@@ -74,6 +74,12 @@ var config = {
         // callStatsThreshold: 5 // enable callstats for 5% of the users.
     },
 
+    // Feature Flags.
+    flags: {
+        // Enables source names in the signaling.
+        // sourceNameSignaling: false,
+    },
+
     // Disables moderator indicators.
     // disableModeratorIndicator: false,
 
@@ -88,6 +94,9 @@ var config = {
 
     // Disables self-view tile. (hides it from tile view and from filmstrip)
     // disableSelfView: false,
+
+    // Disables self-view settings in UI
+    // disableSelfViewSettings: false,
 
     // Disables ICE/UDP by filtering out local and remote UDP candidates in
     // signalling.
@@ -481,6 +490,9 @@ var config = {
     // Default remote name to be displayed
     // defaultRemoteDisplayName: 'Fellow Jitster',
 
+    // Hides the display name from the participant thumbnail
+    // hideDisplayName: false
+
     // Default language for the user interface.
     // defaultLanguage: 'en',
 
@@ -533,6 +545,9 @@ var config = {
     // Whether to automatically copy invitation URL after creating a room.
     // Document should be focused for this option to work
     // enableAutomaticUrlCopy: false,
+
+    // Array with avatar URL prefixes that need to use CORS.
+    // corsAvatarURLs: [ 'https://www.gravatar.com/avatar/' ],
 
     // Base URL for a Gravatar-compatible service. Defaults to libravatar.
     // gravatarBaseURL: 'https://seccdn.libravatar.org/avatar/',
@@ -1017,7 +1032,7 @@ var config = {
     // If a label's id is not in any of the 2 arrays, it will not be visible at all on the header.
     // conferenceInfo: {
     //     // those labels will not be hidden in tandem with the toolbox.
-    //     alwaysVisible: ['recording', 'local-recording'],
+    //     alwaysVisible: ['recording', 'local-recording', 'raised-hands-count'],
     //     // those labels will be auto-hidden in tandem with the toolbox buttons.
     //     autoHide: [
     //         'subject',
@@ -1044,6 +1059,9 @@ var config = {
 
     // Sets the conference subject
     // subject: 'Conference Subject',
+
+    // Sets the conference local subject
+    // localSubject: 'Conference Local Subject',
 
     // This property is related to the use case when jitsi-meet is used via the IFrame API. When the property is true
     // jitsi-meet will use the local storage of the host page instead of its own. This option is useful if the browser
@@ -1149,6 +1167,7 @@ var config = {
     //     'lobby.joinRejectedMessage', // shown when while in a lobby, user's request to join is rejected
     //     'lobby.notificationTitle', // shown when lobby is toggled and when join requests are allowed / denied
     //     'localRecording.localRecording', // shown when a local recording is started
+    //     'notify.chatMessages', // shown when receiving chat messages while the chat window is closed
     //     'notify.disconnected', // shown when a participant has left
     //     'notify.connectedOneMember', // show when a participant joined
     //     'notify.connectedTwoMembers', // show when two participants joined simultaneously

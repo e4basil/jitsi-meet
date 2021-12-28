@@ -57,7 +57,7 @@
         },
         "notifications": {
             "joinedTitle": "غرف جانبية",
-            "joined": " الغرفة الجانبيةالانضمام إلى\"{{name}}\"",
+            "joined": " الغرفة الجانبيةالانضمام إلى {{index}}",
             "joinedMainRoom": "الانضمام للغرفة الرئيسية"
         }
     },
@@ -180,7 +180,8 @@
         "joinInApp": "انضم للاجتماع عبر تطبيق الجوال",
         "launchWebButton": "افتح تطبيق الويب",
         "title": "قيد عقد اجتماعك في {{app}}...",
-        "tryAgainButton": "جرب مرة أخرى في تطبيق الحاسوب"
+        "tryAgainButton": "جرب مرة أخرى في تطبيق الحاسوب",
+        "unsupportedBrowser": "يبدو أنك تستخدم متصفحًا لا ندعمه."
     },
     "defaultLink": "{{url}} مثلًا",
     "defaultNickname": "محمد علي مثلًا",
@@ -418,6 +419,7 @@
         "desktopShareError": "تعذر إنشاء مشاركة سطح المكتب",
         "desktopShare": "مشاركة سطح المكتب",
         "webAssemblyWarning": "WebAssembly غير مدعوم",
+        "webAssemblyWarningDescription": "تم تعطيل WebAssembly أو عدم دعمه بواسطة هذا المستعرض",
         "backgroundEffectError": "فشل تطبيق تأثير الخلفية."
     },
     "feedback": {
@@ -579,10 +581,12 @@
         "allowedUnmute": "يمكنك إعادة صوت الميكروفون و بدء تشغيل الكاميرا أو مشاركة شاشتك.",
         "audioUnmuteBlockedTitle": "تم حظر إعادة صوت الميكروفون!",
         "audioUnmuteBlockedDescription": "تم حظر عملية إلغاء كتم صوت الميكروفون مؤقتًا بسبب قيود النظام.",
+        "chatMessages": "رسائل الدردشة",
         "connectedOneMember": "انضم {{name}} للاجتماع",
         "connectedThreePlusMembers": "انضم {{name}} وعدد {{count}} غيره إلى الاجتماع",
         "connectedTwoMembers": "انضم {{first}} و {{second}} إلى الاجتماع",
         "disconnected": "انقطع الاتصال",
+        "displayNotifications": "عرض الإخطارات لـ",
         "focus": "التركيز على المؤتمر",
         "focusFail": "إنَّ {{component}} غير متاح. ستعاد المحاولة مرة أخرى خلال {{ms}} ثانية.",
         "hostAskedUnmute": "The moderator would like you to speak",
@@ -607,6 +611,7 @@
         "raisedHands": "{{participantName}} و {{raisedHands}}المزيد من الناس",
         "screenShareNoAudio": "لم يتم تحديد مربع مشاركة الصوت في شاشة تحديد النافذة.",
         "screenShareNoAudioTitle": "تعذرت مشاركة صوت النظام!",
+        "selfViewTitle": "يمكنك دائمًا إلغاء إخفاء العرض الذاتي من الإعدادات",
         "somebody": "شخص ما",
         "startSilentTitle": "انضممت دون مخرج للصوت!",
         "startSilentDescription": "أنضم مجدَّدًا للاجتماع لتفعيل الصوت",
@@ -821,8 +826,8 @@
     "security": {
         "about": "يمكنك إضافة $t(lockRoomPassword) إلى الاجتماع. سيتوجب على المشاركين إدخال $t(lockRoomPassword) قبل السماح لهم بالانضمام إلى الاجتماع.",
         "aboutReadOnly": "المشاركون بصفة رئيس الجلسة يمكنهم إضافة $t(lockRoomPassword) إلى الاجتماع. سيتوجب على المشاركين إدخال $t(lockRoomPassword) قبل السماح لهم بالانضمام إلى الاجتماع.",
-        "insecureRoomNameWarning": "اسم الغرفة غير آمن، فقد ينضم عبره مشاركون غرباء إلى الاجتماع. ننصحك بتأمين الاجتماع عبر  وسائل الحماية التي يوفرها زر الحماية.",
-        "securityOptions": "خيارات الحماية"
+        "header": "خيارات الأمان",
+        "insecureRoomNameWarning": "اسم الغرفة غير آمن، فقد ينضم عبره مشاركون غرباء إلى الاجتماع. ننصحك بتأمين الاجتماع عبر  وسائل الحماية التي يوفرها زر الحماية."
     },
     "settings": {
         "calendar": {
@@ -854,6 +859,7 @@
         "selectAudioOutput": "خرج الصوت",
         "selectCamera": "الكاميرا",
         "selectMic": "المجهار (المايكروفون)",
+        "selfView": "عرض ذاتي",
         "sounds": "اصوات",
         "speakers": "المذياع (مكبر الصوت)",
         "startAudioMuted": "بدء الجميع مكتومي الصوت",
@@ -890,20 +896,20 @@
     },
     "speaker": "المتحدث",
     "speakerStats": {
-        "search": "بحث",
+        "angry": "غاضب",
+        "disgusted": "مشمئز",
+        "fearful": "خائف",
+        "happy": "سعيد",
         "hours": "{{count}}س",
         "minutes": "{{count}}د",
         "name": "الاسم",
-        "seconds": "{{count}}ثا",
-        "speakerStats": "حالة المتحدث",
-        "speakerTime": "وقت المتحدث",
-        "happy": "سعيد",
         "neutral": "حيادي",
         "sad": "حزين",
-        "surprised": "مندهش",
-        "angry": "غاضب",
-        "fearful": "خائف",
-        "disgusted": "مشمئز"
+        "search": "بحث",
+        "seconds": "{{count}}ثا",
+        "speakerTime": "وقت المتحدث",
+        "speakerStats": "حالة المتحدث",
+        "surprised": "مندهش"
     },
     "startupoverlay": {
         "policyText": " ",
@@ -946,8 +952,8 @@
             "mute": "اظهِر/اخفِ كتم الصوت",
             "muteEveryone": "كتم الجميع",
             "muteEveryoneElse": "كتم صوت الآخرين",
-            "muteEveryonesVideo": "تعطيل كاميرا الجميع",
-            "muteEveryoneElsesVideo": "تعطيل كاميرا الآخرين",
+            "muteEveryonesVideoStream": "وقّف فيديو الجميع",
+            "muteEveryoneElsesVideoStream": "وقّف فيديو أي شخص آخر",
             "participants": "مشاركون",
             "pip": "استعمل/اخرج من وضع صورة-في-صورة",
             "privateMessage": "أرسل رسالة خاصة",
@@ -1123,6 +1129,7 @@
         "domuteVideoOfOthers": "تعطيل الكاميرا للآخرين",
         "flip": "قلب",
         "grantModerator": "امنح صلاحيات رئيس الجلسة",
+        "hideSelfView": "إخفاء المنظر الذاتي",
         "kick": "طرد خارجًا",
         "moderator": "رئيس الجلسة",
         "mute": "المشارك مكتوم الصوت",
