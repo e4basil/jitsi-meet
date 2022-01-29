@@ -98,6 +98,17 @@ var config = {
     // Disables self-view settings in UI
     // disableSelfViewSettings: false,
 
+    // screenshotCapture : {
+    //      Enables the screensharing capture feature.
+    //      enabled: false,
+    //
+    //      The mode for the screenshot capture feature.
+    //      Can be either 'recording' - screensharing screenshots are taken
+    //      only when the recording is also on,
+    //      or 'always' - screensharing screenshots are always taken.
+    //      mode: 'recording'
+    // }
+
     // Disables ICE/UDP by filtering out local and remote UDP candidates in
     // signalling.
     // webrtcIceUdpDisable: false,
@@ -495,7 +506,10 @@ var config = {
     // defaultRemoteDisplayName: 'Fellow Jitster',
 
     // Hides the display name from the participant thumbnail
-    // hideDisplayName: false
+    // hideDisplayName: false,
+
+    // Hides the dominant speaker name badge that hovers above the toolbox
+    // hideDominantSpeakerBadge: false,
 
     // Default language for the user interface.
     // defaultLanguage: 'en',
