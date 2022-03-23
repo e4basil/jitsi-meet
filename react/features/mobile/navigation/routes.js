@@ -12,6 +12,7 @@ export const screen = {
         help: 'Help'
     },
     dialInSummary: 'Dial-In Info',
+    connecting: 'Connecting',
     conference: {
         root: 'Conference root',
         main: 'Conference',
@@ -24,7 +25,10 @@ export const screen = {
             }
         },
         security: 'Security Options',
+        recording: 'Recording',
+        liveStream: 'Live stream',
         speakerStats: 'Speaker Stats',
+        salesforce: 'Link to Salesforce',
         participants: 'Participants',
         invite: 'Invite',
         sharedDocument: 'Shared document'
