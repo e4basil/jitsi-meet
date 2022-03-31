@@ -20,6 +20,8 @@ import '../shared-video/middleware';
 import '../settings/middleware';
 import '../talk-while-muted/middleware';
 import '../virtual-background/middleware';
+import '../face-centering/middleware';
 import '../facial-recognition/middleware';
+import '../gifs/middleware';
 
 import './middlewares.any';

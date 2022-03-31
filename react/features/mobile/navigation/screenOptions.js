@@ -1,8 +1,8 @@
 // @flow
-/* eslint-disable react/no-multi-comp */
 
 import { TransitionPresets } from '@react-navigation/stack';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Platform } from 'react-native';
 
 import {
@@ -13,10 +13,11 @@ import {
     IconInfo,
     IconSettings
 } from '../../base/icons';
-import BaseTheme from '../../base/ui/components/BaseTheme';
+import BaseTheme from '../../base/ui/components/BaseTheme.native';
 
 import HeaderNavigationButton from './components/HeaderNavigationButton';
 import { goBack } from './components/conference/ConferenceNavigationContainerRef';
+
 
 /**
  * Navigation container theme.
@@ -86,13 +87,14 @@ export const drawerScreenOptions = {
  * Drawer content options.
  */
 export const drawerContentOptions = {
-    drawerActiveBackgroundColor: BaseTheme.palette.ui12,
+    drawerActiveBackgroundColor: BaseTheme.palette.uiBackground,
     drawerActiveTintColor: BaseTheme.palette.screen01Header,
+    drawerInactiveTintColor: BaseTheme.palette.text02,
     drawerLabelStyle: {
         marginLeft: BaseTheme.spacing[2]
     },
     drawerStyle: {
-        backgroundColor: BaseTheme.palette.ui12,
+        backgroundColor: BaseTheme.palette.uiBackground,
         maxWidth: 400,
         width: '75%'
     }
@@ -105,7 +107,7 @@ export const welcomeScreenOptions = {
     ...drawerScreenOptions,
     drawerIcon: ({ focused }) => (
         <Icon
-            color = { focused ? BaseTheme.palette.screen01Header : BaseTheme.palette.field01Disabled }
+            color = { focused ? BaseTheme.palette.screen01Header : BaseTheme.palette.icon02 }
             size = { 20 }
             src = { IconHome } />
     ),
@@ -121,7 +123,7 @@ export const settingsScreenOptions = {
     ...drawerScreenOptions,
     drawerIcon: ({ focused }) => (
         <Icon
-            color = { focused ? BaseTheme.palette.screen01Header : BaseTheme.palette.field01Disabled }
+            color = { focused ? BaseTheme.palette.screen01Header : BaseTheme.palette.icon02 }
             size = { 20 }
             src = { IconSettings } />
     ),
@@ -137,7 +139,7 @@ export const termsAndPrivacyScreenOptions = {
     ...drawerScreenOptions,
     drawerIcon: ({ focused }) => (
         <Icon
-            color = { focused ? BaseTheme.palette.screen01Header : BaseTheme.palette.field01Disabled }
+            color = { focused ? BaseTheme.palette.screen01Header : BaseTheme.palette.icon02 }
             size = { 20 }
             src = { IconInfo } />
     ),
@@ -153,7 +155,7 @@ export const helpScreenOptions = {
     ...drawerScreenOptions,
     drawerIcon: ({ focused }) => (
         <Icon
-            color = { focused ? BaseTheme.palette.screen01Header : BaseTheme.palette.field01Disabled }
+            color = { focused ? BaseTheme.palette.screen01Header : BaseTheme.palette.icon02 }
             size = { 20 }
             src = { IconHelp } />
     ),
@@ -184,7 +186,7 @@ export const chatTabBarOptions = {
     tabBarLabelStyle: {
         fontSize: BaseTheme.typography.labelRegular.fontSize
     },
-    tabBarInactiveTintColor: BaseTheme.palette.field02Disabled,
+    tabBarInactiveTintColor: BaseTheme.palette.text01,
     tabBarIndicatorStyle: {
         backgroundColor: BaseTheme.palette.screen01Header
     }
@@ -196,11 +198,23 @@ export const chatTabBarOptions = {
 export const presentationScreenOptions = {
     ...conferenceModalPresentation,
     headerBackTitleVisible: false,
-    headerLeft: () => (
-        <HeaderNavigationButton
-            onPress = { goBack }
-            src = { IconClose } />
-    ),
+    headerLeft: () => {
+        const { t } = useTranslation();
+
+        if (Platform.OS === 'ios') {
+            return (
+                <HeaderNavigationButton
+                    label = { t('dialog.close') }
+                    onPress = { goBack } />
+            );
+        }
+
+        return (
+            <HeaderNavigationButton
+                onPress = { goBack }
+                src = { IconClose } />
+        );
+    },
     headerStatusBarHeight: 0,
     headerStyle: {
         backgroundColor: BaseTheme.palette.screen01Header
@@ -244,6 +258,30 @@ export const speakerStatsScreenOptions = {
 export const securityScreenOptions = {
     ...presentationScreenOptions
 };
+
+/**
+ * Screen options for recording modal.
+ */
+export const recordingScreenOptions = {
+    ...presentationScreenOptions
+};
+
+/**
+ * Screen options for live stream modal.
+ */
+export const liveStreamScreenOptions = {
+    ...presentationScreenOptions
+};
+
+/**
+ * Screen options for salesforce link modal.
+ */
+export const salesforceScreenOptions = presentationScreenOptions;
+
+/**
+ * Screen options for GIPHY integration modal.
+ */
+export const gifsMenuOptions = presentationScreenOptions;
 
 /**
  * Screen options for shared document.

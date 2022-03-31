@@ -9,7 +9,13 @@ import { getLocalParticipant, getParticipantCount } from '../base/participants';
 import { StateListenerRegistry } from '../base/redux';
 import { getTrackSourceNameByMediaTypeAndParticipant } from '../base/tracks';
 import { reportError } from '../base/util';
-import { shouldDisplayTileView } from '../video-layout';
+import { getActiveParticipantsIds } from '../filmstrip/functions.web';
+import {
+    getVideoQualityForLargeVideo,
+    getVideoQualityForResizableFilmstripThumbnails,
+    getVideoQualityForStageThumbnails,
+    shouldDisplayTileView
+} from '../video-layout';
 
 import { setMaxReceiverVideoQuality } from './actions';
 import { VIDEO_QUALITY_LEVELS } from './constants';
@@ -29,6 +35,12 @@ StateListenerRegistry.register(
     /* listener */ debounce((visibleRemoteParticipants, store) => {
         _updateReceiverVideoConstraints(store);
     }, 100));
+
+StateListenerRegistry.register(
+    /* selector */ state => state['features/base/tracks'],
+    /* listener */(remoteTracks, store) => {
+        _updateReceiverVideoConstraints(store);
+    });
 
 /**
  * Handles the use case when the on-stage participant has changed.
@@ -71,6 +83,27 @@ StateListenerRegistry.register(
     /* listener */ (lastN, store) => {
         _updateReceiverVideoConstraints(store);
     });
+
+/**
+ * Updates the receiver constraints when the tiles in the resizable filmstrip change dimensions.
+ */
+StateListenerRegistry.register(
+    state => getVideoQualityForResizableFilmstripThumbnails(state),
+    (_, store) => {
+        _updateReceiverVideoConstraints(store);
+    }
+);
+
+/**
+ * Updates the receiver constraints when the stage participants change.
+ */
+StateListenerRegistry.register(
+    state => getActiveParticipantsIds(state).sort()
+        .join(),
+    (_, store) => {
+        _updateReceiverVideoConstraints(store);
+    }
+);
 
 /**
  * StateListenerRegistry provides a reliable way of detecting changes to
@@ -199,6 +232,7 @@ function _updateReceiverVideoConstraints({ getState }) {
     const tracks = state['features/base/tracks'];
     const sourceNameSignaling = getSourceNameSignalingFeatureFlag(state);
     const localParticipantId = getLocalParticipant(state).id;
+    const activeParticipantsIds = getActiveParticipantsIds(state);
 
     let receiverConstraints;
 
@@ -212,6 +246,7 @@ function _updateReceiverVideoConstraints({ getState }) {
         };
         const visibleRemoteTrackSourceNames = [];
         let largeVideoSourceName;
+        const activeParticipantsSources = [];
 
         if (visibleRemoteParticipants?.size) {
             visibleRemoteParticipants.forEach(participantId => {
@@ -219,6 +254,9 @@ function _updateReceiverVideoConstraints({ getState }) {
 
                 if (sourceName) {
                     visibleRemoteTrackSourceNames.push(sourceName);
+                    if (activeParticipantsIds.find(id => id === participantId)) {
+                        activeParticipantsSources.push(sourceName);
+                    }
                 }
             });
         }
@@ -256,13 +294,26 @@ function _updateReceiverVideoConstraints({ getState }) {
             }
 
             if (visibleRemoteTrackSourceNames?.length) {
+                const qualityLevel = getVideoQualityForResizableFilmstripThumbnails(state);
+                const stageParticipantsLevel = getVideoQualityForStageThumbnails(state);
+
                 visibleRemoteTrackSourceNames.forEach(sourceName => {
-                    receiverConstraints.constraints[sourceName] = { 'maxHeight': VIDEO_QUALITY_LEVELS.LOW };
+                    const isStageParticipant = activeParticipantsSources.find(name => name === sourceName);
+                    const quality = Math.min(maxFrameHeight, isStageParticipant
+                        ? stageParticipantsLevel : qualityLevel);
+
+                    receiverConstraints.constraints[sourceName] = { 'maxHeight': quality };
                 });
             }
 
             if (largeVideoSourceName) {
-                receiverConstraints.constraints[largeVideoSourceName] = { 'maxHeight': maxFrameHeight };
+                let quality = maxFrameHeight;
+
+                if (navigator.product !== 'ReactNative'
+                    && !remoteScreenShares.find(id => id === largeVideoParticipantId)) {
+                    quality = getVideoQualityForLargeVideo();
+                }
+                receiverConstraints.constraints[largeVideoSourceName] = { 'maxHeight': quality };
                 receiverConstraints.onStageSources = [ largeVideoSourceName ];
             }
         }
@@ -277,7 +328,6 @@ function _updateReceiverVideoConstraints({ getState }) {
         };
 
         // Tile view.
-        // eslint-disable-next-line no-lonely-if
         if (shouldDisplayTileView(state)) {
             if (!visibleRemoteParticipants?.size) {
                 return;
@@ -297,13 +347,26 @@ function _updateReceiverVideoConstraints({ getState }) {
             }
 
             if (visibleRemoteParticipants?.size > 0) {
+                const qualityLevel = getVideoQualityForResizableFilmstripThumbnails(state);
+                const stageParticipantsLevel = getVideoQualityForStageThumbnails(state);
+
                 visibleRemoteParticipants.forEach(participantId => {
-                    receiverConstraints.constraints[participantId] = { 'maxHeight': VIDEO_QUALITY_LEVELS.LOW };
+                    const isStageParticipant = activeParticipantsIds.find(id => id === participantId);
+                    const quality = Math.min(maxFrameHeight, isStageParticipant
+                        ? stageParticipantsLevel : qualityLevel);
+
+                    receiverConstraints.constraints[participantId] = { 'maxHeight': quality };
                 });
             }
 
             if (largeVideoParticipantId) {
-                receiverConstraints.constraints[largeVideoParticipantId] = { 'maxHeight': maxFrameHeight };
+                let quality = maxFrameHeight;
+
+                if (navigator.product !== 'ReactNative'
+                    && !remoteScreenShares.find(id => id === largeVideoParticipantId)) {
+                    quality = getVideoQualityForLargeVideo();
+                }
+                receiverConstraints.constraints[largeVideoParticipantId] = { 'maxHeight': quality };
                 receiverConstraints.onStageEndpoints = [ largeVideoParticipantId ];
             }
         }

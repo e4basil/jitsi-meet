@@ -39,10 +39,20 @@ import {
     raiseHand,
     isParticipantModerator,
     isLocalParticipantModerator,
-    hasRaisedHand
+    hasRaisedHand,
+    grantModerator
 } from '../../react/features/base/participants';
 import { updateSettings } from '../../react/features/base/settings';
 import { isToggleCameraEnabled, toggleCamera } from '../../react/features/base/tracks';
+import {
+    autoAssignToBreakoutRooms,
+    closeBreakoutRoom,
+    createBreakoutRoom,
+    moveToRoom,
+    removeBreakoutRoom,
+    sendParticipantToRoom
+} from '../../react/features/breakout-rooms/actions';
+import { getBreakoutRooms } from '../../react/features/breakout-rooms/functions';
 import {
     sendMessage,
     setPrivateMessageRecipient,
@@ -63,8 +73,12 @@ import {
     captureLargeVideoScreenshot,
     resizeLargeVideo
 } from '../../react/features/large-video/actions.web';
-import { toggleLobbyMode, setKnockingParticipantApproval } from '../../react/features/lobby/actions';
-import { isForceMuted } from '../../react/features/participants-pane/functions';
+import { toggleLobbyMode, answerKnockingParticipant } from '../../react/features/lobby/actions';
+import {
+    close as closeParticipantsPane,
+    open as openParticipantsPane
+} from '../../react/features/participants-pane/actions';
+import { getParticipantsPaneOpen, isForceMuted } from '../../react/features/participants-pane/functions';
 import { RECORDING_TYPES } from '../../react/features/recording/constants';
 import { getActiveSession } from '../../react/features/recording/functions';
 import { isScreenAudioSupported } from '../../react/features/screen-share';
@@ -118,8 +132,16 @@ let videoAvailable = true;
  */
 function initCommands() {
     commands = {
+        'add-breakout-room': name => {
+            if (!isLocalParticipantModerator(APP.store.getState())) {
+                logger.error('Missing moderator rights to add breakout rooms');
+
+                return;
+            }
+            APP.store.dispatch(createBreakoutRoom(name));
+        },
         'answer-knocking-participant': (id, approved) => {
-            APP.store.dispatch(setKnockingParticipantApproval(id, approved));
+            APP.store.dispatch(answerKnockingParticipant(id, approved));
         },
         'approve-video': participantId => {
             if (!isLocalParticipantModerator(APP.store.getState())) {
@@ -134,6 +156,22 @@ function initCommands() {
             }
 
             APP.store.dispatch(approveParticipantAudio(participantId));
+        },
+        'auto-assign-to-breakout-rooms': () => {
+            if (!isLocalParticipantModerator(APP.store.getState())) {
+                logger.error('Missing moderator rights to auto-assign participants to breakout rooms');
+
+                return;
+            }
+            APP.store.dispatch(autoAssignToBreakoutRooms());
+        },
+        'grant-moderator': participantId => {
+            if (!isLocalParticipantModerator(APP.store.getState())) {
+                logger.error('Missing moderator rights to grant moderator right to another participant');
+
+                return;
+            }
+            APP.store.dispatch(grantModerator(participantId));
         },
         'display-name': displayName => {
             sendAnalytics(createApiEvent('display.name.changed'));
@@ -197,6 +235,14 @@ function initCommands() {
             const reject = mediaType === MEDIA_TYPE.VIDEO ? rejectParticipantVideo : rejectParticipantAudio;
 
             APP.store.dispatch(reject(participantId));
+        },
+        'remove-breakout-room': breakoutRoomJid => {
+            if (!isLocalParticipantModerator(APP.store.getState())) {
+                logger.error('Missing moderator rights to remove breakout rooms');
+
+                return;
+            }
+            APP.store.dispatch(removeBreakoutRoom(breakoutRoomJid));
         },
         'resize-large-video': (width, height) => {
             logger.debug('Resize large video command received');
@@ -283,6 +329,12 @@ function initCommands() {
             } else {
                 APP.store.dispatch(disable());
             }
+        },
+        'toggle-participants-pane': enabled => {
+            const toggleParticipantsPane = enabled
+                ? openParticipantsPane : closeParticipantsPane;
+
+            APP.store.dispatch(toggleParticipantsPane());
         },
         'toggle-raise-hand': () => {
             const localParticipant = getLocalParticipant(APP.store.getState());
@@ -537,6 +589,26 @@ function initCommands() {
         'cancel-private-chat': () => {
             APP.store.dispatch(setPrivateMessageRecipient());
         },
+        'close-breakout-room': roomId => {
+            if (!isLocalParticipantModerator(APP.store.getState())) {
+                logger.error('Missing moderator rights to close breakout rooms');
+
+                return;
+            }
+            APP.store.dispatch(closeBreakoutRoom(roomId));
+        },
+        'join-breakout-room': roomId => {
+            APP.store.dispatch(moveToRoom(roomId));
+        },
+        'send-participant-to-room': (participantId, roomId) => {
+            if (!isLocalParticipantModerator(APP.store.getState())) {
+                logger.error('Missing moderator rights to send participants to rooms');
+
+                return;
+            }
+
+            APP.store.dispatch(sendParticipantToRoom(participantId, roomId));
+        },
         'kick-participant': participantId => {
             APP.store.dispatch(kickParticipant(participantId));
         },
@@ -637,6 +709,10 @@ function initCommands() {
             callback(isForceMuted(participant, type, state));
             break;
         }
+        case 'is-participants-pane-open': {
+            callback(getParticipantsPaneOpen(APP.store.getState()));
+            break;
+        }
         case 'is-video-muted':
             callback(APP.conference.isLocalVideoMuted());
             break;
@@ -679,6 +755,10 @@ function initCommands() {
             callback({
                 avatarBackgrounds: APP.store.getState()['features/dynamic-branding'].avatarBackgrounds
             });
+            break;
+        }
+        case 'list-breakout-rooms': {
+            callback(getBreakoutRooms(APP.store.getState()));
             break;
         }
         default:
@@ -1148,8 +1228,8 @@ class API {
      *
      * @param {string} roomName - The room name.
      * @param {string} id - The id of the local user.
-     * @param {Object} props - The display name and avatar URL of the local
-     * user.
+     * @param {Object} props - The display name, the avatar URL of the local
+     * user and the type of the room.
      * @returns {void}
      */
     notifyConferenceJoined(roomName: string, id: string, props: Object) {
