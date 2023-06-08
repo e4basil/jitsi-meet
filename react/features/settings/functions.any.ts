@@ -15,8 +15,7 @@ import { isStageFilmstripEnabled } from '../filmstrip/functions';
 import { isFollowMeActive } from '../follow-me/functions';
 import { getParticipantsPaneConfig } from '../participants-pane/functions';
 import { isReactionsEnabled } from '../reactions/functions.any';
-
-import { SS_DEFAULT_FRAME_RATE, SS_SUPPORTED_FRAMERATES } from './constants';
+import { iAmVisitor } from '../visitors/functions';
 
 /**
  * Used for web. Indicates if the setting section is enabled.
@@ -60,8 +59,7 @@ export function normalizeUserInputURL(url: string) {
         const urlRegExp = new RegExp('^(\\w+://)?(.+)$');
         const urlComponents = urlRegExp.exec(url);
 
-        if (urlComponents && (!urlComponents[1]
-                || !urlComponents[1].startsWith('http'))) {
+        if (urlComponents && !urlComponents[1]?.startsWith('http')) {
             url = `https://${urlComponents[2]}`;
         }
 
@@ -115,28 +113,23 @@ export function getNotificationsMap(stateful: IStateful) {
  */
 export function getMoreTabProps(stateful: IStateful) {
     const state = toState(stateful);
-    const framerate = state['features/screen-share'].captureFrameRate ?? SS_DEFAULT_FRAME_RATE;
+    const stageFilmstripEnabled = isStageFilmstripEnabled(state);
     const language = i18next.language || DEFAULT_LANGUAGE;
     const configuredTabs: string[] = interfaceConfig.SETTINGS_SECTIONS || [];
-    const enabledNotifications = getNotificationsMap(stateful);
-    const stageFilmstripEnabled = isStageFilmstripEnabled(state);
 
     // when self view is controlled by the config we hide the settings
     const { disableSelfView, disableSelfViewSettings } = state['features/base/config'];
 
     return {
-        currentFramerate: framerate,
         currentLanguage: language,
-        desktopShareFramerates: SS_SUPPORTED_FRAMERATES,
         disableHideSelfView: disableSelfViewSettings || disableSelfView,
         hideSelfView: getHideSelfView(state),
+        iAmVisitor: iAmVisitor(state),
         languages: LANGUAGES,
+        maxStageParticipants: state['features/base/settings'].maxStageParticipants,
         showLanguageSettings: configuredTabs.includes('language'),
-        enabledNotifications,
-        showNotificationsSettings: Object.keys(enabledNotifications).length > 0,
         showPrejoinPage: !state['features/base/settings'].userSelectedSkipPrejoin,
         showPrejoinSettings: state['features/base/config'].prejoinConfig?.enabled,
-        maxStageParticipants: state['features/base/settings'].maxStageParticipants,
         stageFilmstripEnabled
     };
 }
@@ -213,8 +206,9 @@ export function getProfileTabProps(stateful: IStateful) {
         authLogin,
         displayName: localParticipant?.name,
         email: localParticipant?.email,
-        readOnlyName: isNameReadOnly(state),
-        hideEmailInSettings
+        hideEmailInSettings,
+        id: localParticipant?.id,
+        readOnlyName: isNameReadOnly(state)
     };
 }
 
@@ -224,10 +218,11 @@ export function getProfileTabProps(stateful: IStateful) {
  *
  * @param {(Function|Object)} stateful -The (whole) redux state, or redux's
  * {@code getState} function to be used to retrieve the state.
+ * @param {boolean} showSoundsSettings - Whether to show the sound settings or not.
  * @returns {Object} - The properties for the "Sounds" tab from settings
  * dialog.
  */
-export function getSoundsTabProps(stateful: IStateful) {
+export function getNotificationsTabProps(stateful: IStateful, showSoundsSettings?: boolean) {
     const state = toState(stateful);
     const {
         soundsIncomingMessage,
@@ -239,8 +234,12 @@ export function getSoundsTabProps(stateful: IStateful) {
     } = state['features/base/settings'];
     const enableReactions = isReactionsEnabled(state);
     const moderatorMutedSoundsReactions = state['features/base/conference'].startReactionsMuted ?? false;
+    const enabledNotifications = getNotificationsMap(stateful);
 
     return {
+        disabledSounds: state['features/base/config'].disabledSounds || [],
+        enabledNotifications,
+        showNotificationsSettings: Object.keys(enabledNotifications).length > 0,
         soundsIncomingMessage,
         soundsParticipantJoined,
         soundsParticipantKnocking,
@@ -248,7 +247,8 @@ export function getSoundsTabProps(stateful: IStateful) {
         soundsTalkWhileMuted,
         soundsReactions,
         enableReactions,
-        moderatorMutedSoundsReactions
+        moderatorMutedSoundsReactions,
+        showSoundsSettings
     };
 }
 

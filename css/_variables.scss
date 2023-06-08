@@ -161,7 +161,7 @@ $welcomePageHeaderBackground: linear-gradient(0deg, rgba(0, 0, 0, 0.2), rgba(0, 
 $welcomePageHeaderBackgroundPosition: center;
 $welcomePageHeaderBackgroundRepeat: none;
 $welcomePageHeaderBackgroundSize: cover;
-$welcomePageHeaderPaddingBottom: 0px;
+$welcomePageHeaderPaddingBottom: 15px;
 $welcomePageHeaderTitleMaxWidth: initial;
 $welcomePageHeaderTextAlign: center;
 
@@ -200,11 +200,6 @@ $deepLinkingDialInConferenceIdMargin: 10px 0 10px 0;
 $deepLinkingDialInConferenceIdPadding: inherit;
 $deepLinkingDialInConferenceIdBackgroundColor: inherit;
 $deepLinkingDialInConferenceIdBorderRadius: inherit;
-
-$deepLinkingDialInConferenceNameFontSize: inherit;
-$deepLinkingDialInConferenceNameLineHeight: inherit;
-$deepLinkingDialInConferenceNameMarginBottom: none;
-$deepLinkingDialInConferenceNameFontWeight: inherit;
 
 $deepLinkingDialInConferenceDescriptionFontSize: 0.8em;
 $deepLinkingDialInConferenceDescriptionLineHeight: inherit;

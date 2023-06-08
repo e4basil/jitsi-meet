@@ -1,17 +1,15 @@
-// @ts-ignore
-import { PC_CON_STATE_CHANGE,
+/* eslint-disable lines-around-comment */
+import {
+    PC_CON_STATE_CHANGE,
     PC_STATE_CONNECTED,
     PC_STATE_FAILED
-
-    // @ts-ignore
+    // @ts-expect-error
 } from '@jitsi/rtcstats/events';
-// eslint-disable-next-line lines-around-comment
-// @ts-ignore
+// @ts-expect-error
 import rtcstatsInit from '@jitsi/rtcstats/rtcstats';
-// eslint-disable-next-line lines-around-comment
-// @ts-ignore
+// @ts-expect-error
 import traceInit from '@jitsi/rtcstats/trace-ws';
-
+/* eslint-enable lines-around-comment */
 
 import { createRTCStatsTraceCloseEvent } from '../analytics/AnalyticsEvents';
 import { sendAnalytics } from '../analytics/functions';
@@ -47,8 +45,45 @@ function connectionFilter(config: any) {
  */
 class RTCStats {
     trace: any;
-    initialized = false;
+    options?: InitOptions;
+    isPeerConnectionWrapped = false;
     connStateEvents: any = [];
+
+    /**
+     * Initialize the rtcstats components, if the options have changed.
+     *
+     * @param {Oject} newOptions -.
+     * @returns {void}
+     */
+    maybeInit(newOptions: InitOptions) {
+        const oldOptions = this.options;
+        const changed = !oldOptions || (oldOptions.endpoint !== newOptions.endpoint
+            || oldOptions.meetingFqn !== newOptions.meetingFqn
+            || oldOptions.pollInterval !== newOptions.pollInterval
+            || oldOptions.sendSdp !== newOptions.sendSdp
+            || oldOptions.useLegacy !== newOptions.useLegacy);
+
+        if (changed) {
+            this.reset();
+
+            if (newOptions.meetingFqn && newOptions.endpoint) {
+                this.init(newOptions);
+            } else {
+                logger.warn('RTCStats is enabled but it has not been configured.');
+            }
+        }
+    }
+
+    /**
+     * Wrapper method for the underlying trace object to be used as a static reference from inside the wrapped
+     * PeerConnection.
+     *
+     * @param {any[]} data - The stats entry to send to the rtcstats endpoint.
+     * @returns {void}
+     */
+    statsEntry(...data: any[]) {
+        this.trace?.statsEntry(...data);
+    }
 
     /**
      * Initialize the rtcstats components. First off we initialize the trace, which is a wrapped websocket
@@ -77,17 +112,22 @@ class RTCStats {
             useLegacy
         };
 
-        const rtcstatsOptions = {
-            connectionFilter,
-            pollInterval,
-            useLegacy,
-            sendSdp,
-            eventCallback: this.handleRtcstatsEvent.bind(this)
-        };
-
         this.trace = traceInit(traceOptions);
-        rtcstatsInit(this.trace, rtcstatsOptions);
-        this.initialized = true;
+        if (!this.isPeerConnectionWrapped) {
+            const rtcstatsOptions = {
+                connectionFilter,
+                pollInterval,
+                useLegacy,
+                sendSdp,
+                eventCallback: this.handleRtcstatsEvent.bind(this)
+            };
+
+            const statsEntryCallback = { statsEntry: this.statsEntry.bind(this) };
+
+            rtcstatsInit(statsEntryCallback, rtcstatsOptions);
+            this.isPeerConnectionWrapped = true;
+        }
+        this.options = options;
     }
 
     /**
@@ -96,7 +136,21 @@ class RTCStats {
      * @returns {boolean}
      */
     isInitialized() {
-        return this.initialized;
+        return this.options !== undefined;
+    }
+
+    /**
+     * Resets the rtcstats.
+     *
+     * @returns {void}
+     */
+    reset() {
+        delete this.options;
+
+        if (this.trace) {
+            this.trace.close();
+            delete this.trace;
+        }
     }
 
     /**

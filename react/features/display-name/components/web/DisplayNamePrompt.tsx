@@ -1,7 +1,7 @@
 import React from 'react';
+import { connect } from 'react-redux';
 
 import { translate } from '../../../base/i18n/functions';
-import { connect } from '../../../base/redux/functions';
 import Dialog from '../../../base/ui/components/web/Dialog';
 import Input from '../../../base/ui/components/web/Input';
 import AbstractDisplayNamePrompt, { IProps } from '../AbstractDisplayNamePrompt';
@@ -63,7 +63,8 @@ class DisplayNamePrompt extends AbstractDisplayNamePrompt<IState> {
                     onChange = { this._onDisplayNameChange }
                     type = 'text'
                     value = { this.state.displayName } />
-            </Dialog>);
+            </Dialog>
+        );
     }
 
     /**

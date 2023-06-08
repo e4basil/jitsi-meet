@@ -3,6 +3,7 @@ import { getToolbarButtons } from '../base/config/functions.web';
 import { hasAvailableDevices } from '../base/devices/functions';
 import { MEET_FEATURES } from '../base/jwt/constants';
 import { isJwtFeatureEnabled } from '../base/jwt/functions';
+import { IGUMPendingState } from '../base/media/types';
 import { isScreenMediaShared } from '../screen-share/functions';
 import { isWhiteboardVisible } from '../whiteboard/functions';
 
@@ -108,9 +109,11 @@ export function isVideoSettingsButtonDisabled(state: IReduxState) {
  * @returns {boolean}
  */
 export function isVideoMuteButtonDisabled(state: IReduxState) {
-    const { muted, unmuteBlocked } = state['features/base/media'].video;
+    const { muted, unmuteBlocked, gumPending } = state['features/base/media'].video;
 
-    return !hasAvailableDevices(state, 'videoInput') || (unmuteBlocked && Boolean(muted));
+    return !hasAvailableDevices(state, 'videoInput')
+        || (unmuteBlocked && Boolean(muted))
+        || gumPending !== IGUMPendingState.NONE;
 }
 
 /**
@@ -122,6 +125,16 @@ export function isVideoMuteButtonDisabled(state: IReduxState) {
  */
 export function showOverflowDrawer(state: IReduxState) {
     return state['features/toolbox'].overflowDrawer;
+}
+
+/**
+ * Returns true if the overflow menu button is displayed and false otherwise.
+ *
+ * @param {IReduxState} state - The state from the Redux store.
+ * @returns {boolean} - True if the overflow menu button is displayed and false otherwise.
+ */
+export function showOverflowMenu(state: IReduxState) {
+    return state['features/toolbox'].overflowMenuVisible;
 }
 
 /**

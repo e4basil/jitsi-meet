@@ -3,6 +3,7 @@ import { sendAnalytics } from '../../analytics/functions';
 import { appNavigate } from '../../app/actions';
 import { IReduxState, IStore } from '../../app/types';
 import { endpointMessageReceived } from '../../subtitles/actions.any';
+import { iAmVisitor } from '../../visitors/functions';
 import { getReplaceParticipant } from '../config/functions';
 import { disconnect } from '../connection/actions';
 import { JITSI_CONNECTION_CONFERENCE_KEY } from '../connection/constants';
@@ -97,34 +98,32 @@ function _addConferenceListeners(conference: IJitsiConference, dispatch: IStore[
         JitsiConferenceEvents.AUTH_STATUS_CHANGED,
         (authEnabled: boolean, authLogin: string) => dispatch(authStatusChanged(authEnabled, authLogin)));
     conference.on(
-        JitsiConferenceEvents.CONFERENCE_FAILED, // @ts-ignore
-        (...args: any[]) => dispatch(conferenceFailed(conference, ...args)));
+        JitsiConferenceEvents.CONFERENCE_FAILED,
+        (err: string, ...args: any[]) => dispatch(conferenceFailed(conference, err, ...args)));
     conference.on(
-        JitsiConferenceEvents.CONFERENCE_JOINED, // @ts-ignore
-        (...args: any[]) => dispatch(conferenceJoined(conference, ...args)));
+        JitsiConferenceEvents.CONFERENCE_JOINED,
+        (..._args: any[]) => dispatch(conferenceJoined(conference)));
     conference.on(
-        JitsiConferenceEvents.CONFERENCE_UNIQUE_ID_SET, // @ts-ignore
-        (...args: any[]) => dispatch(conferenceUniqueIdSet(conference, ...args)));
+        JitsiConferenceEvents.CONFERENCE_UNIQUE_ID_SET,
+        (..._args: any[]) => dispatch(conferenceUniqueIdSet(conference)));
     conference.on(
-        JitsiConferenceEvents.CONFERENCE_JOIN_IN_PROGRESS, // @ts-ignore
-        (...args: any[]) => dispatch(conferenceJoinInProgress(conference, ...args)));
+        JitsiConferenceEvents.CONFERENCE_JOIN_IN_PROGRESS,
+        (..._args: any[]) => dispatch(conferenceJoinInProgress(conference)));
     conference.on(
         JitsiConferenceEvents.CONFERENCE_LEFT,
-        (...args: any[]) => {
+        (..._args: any[]) => {
             dispatch(conferenceTimestampChanged(0));
-
-            // @ts-ignore
-            dispatch(conferenceLeft(conference, ...args));
+            dispatch(conferenceLeft(conference));
         });
-    conference.on(JitsiConferenceEvents.SUBJECT_CHANGED, // @ts-ignore
-        (...args: any[]) => dispatch(conferenceSubjectChanged(...args)));
+    conference.on(JitsiConferenceEvents.SUBJECT_CHANGED,
+        (subject: string) => dispatch(conferenceSubjectChanged(subject)));
 
-    conference.on(JitsiConferenceEvents.CONFERENCE_CREATED_TIMESTAMP, // @ts-ignore
-        (...args: any[]) => dispatch(conferenceTimestampChanged(...args)));
+    conference.on(JitsiConferenceEvents.CONFERENCE_CREATED_TIMESTAMP,
+        (timestamp: number) => dispatch(conferenceTimestampChanged(timestamp)));
 
     conference.on(
-        JitsiConferenceEvents.KICKED, // @ts-ignore
-        (...args: any[]) => dispatch(kickedOut(conference, ...args)));
+        JitsiConferenceEvents.KICKED,
+        (participant: any) => dispatch(kickedOut(conference, participant)));
 
     conference.on(
         JitsiConferenceEvents.PARTICIPANT_KICKED,
@@ -135,8 +134,8 @@ function _addConferenceListeners(conference: IJitsiConference, dispatch: IStore[
         (jitsiParticipant: IJitsiParticipant) => dispatch(participantSourcesUpdated(jitsiParticipant)));
 
     conference.on(
-        JitsiConferenceEvents.LOCK_STATE_CHANGED, // @ts-ignore
-        (...args: any[]) => dispatch(lockStateChanged(conference, ...args)));
+        JitsiConferenceEvents.LOCK_STATE_CHANGED,
+        (locked: boolean) => dispatch(lockStateChanged(conference, locked)));
 
     // Dispatches into features/base/media follow:
 
@@ -219,12 +218,12 @@ function _addConferenceListeners(conference: IJitsiConference, dispatch: IStore[
         });
 
     conference.on(
-        JitsiConferenceEvents.ENDPOINT_MESSAGE_RECEIVED, // @ts-ignore
-        (...args: any[]) => dispatch(endpointMessageReceived(...args)));
+        JitsiConferenceEvents.ENDPOINT_MESSAGE_RECEIVED,
+        (participant: Object, json: Object) => dispatch(endpointMessageReceived(participant, json)));
 
     conference.on(
-        JitsiConferenceEvents.NON_PARTICIPANT_MESSAGE_RECEIVED, // @ts-ignore
-        (...args: any[]) => dispatch(nonParticipantMessageReceived(...args)));
+        JitsiConferenceEvents.NON_PARTICIPANT_MESSAGE_RECEIVED,
+        (id: string, json: Object) => dispatch(nonParticipantMessageReceived(id, json)));
 
     conference.on(
         JitsiConferenceEvents.USER_JOINED,
@@ -233,15 +232,15 @@ function _addConferenceListeners(conference: IJitsiConference, dispatch: IStore[
         JitsiConferenceEvents.USER_LEFT,
         (_id: string, user: any) => commonUserLeftHandling({ dispatch }, conference, user));
     conference.on(
-        JitsiConferenceEvents.USER_ROLE_CHANGED, // @ts-ignore
-        (...args: any[]) => dispatch(participantRoleChanged(...args)));
+        JitsiConferenceEvents.USER_ROLE_CHANGED,
+        (id: string, role: string) => dispatch(participantRoleChanged(id, role)));
     conference.on(
-        JitsiConferenceEvents.USER_STATUS_CHANGED, // @ts-ignore
-        (...args: any[]) => dispatch(participantPresenceChanged(...args)));
+        JitsiConferenceEvents.USER_STATUS_CHANGED,
+        (id: string, presence: string) => dispatch(participantPresenceChanged(id, presence)));
 
     conference.on(
-        JitsiE2ePingEvents.E2E_RTT_CHANGED, // @ts-ignore
-        (...args: any[]) => dispatch(e2eRttChanged(...args)));
+        JitsiE2ePingEvents.E2E_RTT_CHANGED,
+        (participant: Object, rtt: number) => dispatch(e2eRttChanged(participant, rtt)));
 
     conference.on(
         JitsiConferenceEvents.BOT_TYPE_CHANGED,
@@ -384,7 +383,7 @@ export function conferenceJoinInProgress(conference: IJitsiConference) {
  *     conference: JitsiConference
  * }}
  */
-export function conferenceLeft(conference: Partial<IJitsiConference>) {
+export function conferenceLeft(conference?: IJitsiConference) {
     return {
         type: CONFERENCE_LEFT,
         conference
@@ -450,11 +449,12 @@ export function conferenceUniqueIdSet(conference: IJitsiConference) {
  */
 export function _conferenceWillJoin(conference: IJitsiConference) {
     return (dispatch: IStore['dispatch'], getState: IStore['getState']) => {
+        const state = getState();
         const localTracks
-            = getLocalTracks(getState()['features/base/tracks'])
+            = getLocalTracks(state['features/base/tracks'])
                 .map(t => t.jitsiTrack);
 
-        if (localTracks.length) {
+        if (localTracks.length && !iAmVisitor(state)) {
             _addLocalTracksToConference(conference, localTracks);
         }
 
@@ -473,7 +473,7 @@ export function _conferenceWillJoin(conference: IJitsiConference) {
  *     conference: JitsiConference
  * }}
  */
-export function conferenceWillJoin(conference: IJitsiConference) {
+export function conferenceWillJoin(conference?: IJitsiConference) {
     return {
         type: CONFERENCE_WILL_JOIN,
         conference
@@ -493,7 +493,7 @@ export function conferenceWillJoin(conference: IJitsiConference) {
  *     conference: JitsiConference
  * }}
  */
-export function conferenceWillLeave(conference: IJitsiConference) {
+export function conferenceWillLeave(conference?: IJitsiConference) {
     return {
         type: CONFERENCE_WILL_LEAVE,
         conference
@@ -530,8 +530,6 @@ export function createConference(overrideRoom?: string | String) {
         if (tmp.domain) {
             // eslint-disable-next-line no-new-wrappers
             _room = new String(tmp);
-
-            // $FlowExpectedError
             _room.domain = tmp.domain;
         }
 
@@ -569,7 +567,6 @@ export function checkIfCanJoin() {
 
         const replaceParticipant = getReplaceParticipant(getState());
 
-        // @ts-ignore
         authRequired && dispatch(_conferenceWillJoin(authRequired));
         authRequired?.join(password, replaceParticipant);
     };
@@ -634,7 +631,7 @@ export function endConference() {
  *     participant: JitsiParticipant
  * }}
  */
-export function kickedOut(conference: Object, participant: Object) {
+export function kickedOut(conference: IJitsiConference, participant: Object) {
     return {
         type: KICKED_OUT,
         conference,
@@ -674,7 +671,7 @@ export function leaveConference() {
  *     locked: boolean
  * }}
  */
-export function lockStateChanged(conference: Object, locked: boolean) {
+export function lockStateChanged(conference: IJitsiConference, locked: boolean) {
     return {
         type: LOCK_STATE_CHANGED,
         conference,
@@ -693,7 +690,7 @@ export function lockStateChanged(conference: Object, locked: boolean) {
  *      json: Object
  * }}
  */
-export function nonParticipantMessageReceived(id: String, json: Object) {
+export function nonParticipantMessageReceived(id: string, json: Object) {
     return {
         type: NON_PARTICIPANT_MESSAGE_RECEIVED,
         id,
@@ -809,7 +806,7 @@ export function setStartReactionsMuted(muted: boolean, updateBackend = false) {
 export function setPassword(
         conference: IJitsiConference | undefined,
         method: Function | undefined,
-        password: string) {
+        password?: string) {
     return (dispatch: IStore['dispatch'], getState: IStore['getState']) => {
         if (!conference) {
             return;

@@ -1,17 +1,14 @@
 import React, { PureComponent } from 'react';
 import { WithTranslation } from 'react-i18next';
+import { connect } from 'react-redux';
 
 import { IStore } from '../../app/types';
 import { hideDialog } from '../../base/dialog/actions';
 import { translate } from '../../base/i18n/functions';
-import { connect } from '../../base/redux/functions';
 import Dialog from '../../base/ui/components/web/Dialog';
 import Tabs from '../../base/ui/components/web/Tabs';
-// eslint-disable-next-line lines-around-comment
-// @ts-ignore
 import { obtainDesktopSources } from '../functions';
 
-// @ts-ignore
 import DesktopPickerPane from './DesktopPickerPane';
 
 /**
@@ -90,7 +87,7 @@ interface IState {
     /**
      * An object containing all the DesktopCapturerSources.
      */
-    sources: Object;
+    sources: any;
 
     /**
      * The desktop source types to fetch previews for.
@@ -191,7 +188,7 @@ class DesktopPicker extends PureComponent<IProps, IState> {
      * @inheritdoc
      */
     render() {
-        const { selectedTab, selectedSource, sources } = this.state;
+        const { selectedTab, selectedSource, sources, types } = this.state;
 
         return (
             <Dialog
@@ -204,14 +201,27 @@ class DesktopPicker extends PureComponent<IProps, IState> {
                 size = 'large'
                 titleKey = 'dialog.shareYourScreen'>
                 { this._renderTabs() }
-                <DesktopPickerPane
-                    key = { selectedTab }
-                    onClick = { this._onPreviewClick }
-                    onDoubleClick = { this._onSubmit }
-                    onShareAudioChecked = { this._onShareAudioChecked }
-                    selectedSourceId = { selectedSource.id }
-                    sources = { sources[selectedTab as keyof typeof sources] }
-                    type = { selectedTab } />
+                {types.map(type => (
+                    <div
+                        aria-labelledby = { `${type}-button` }
+                        className = { selectedTab === type ? undefined : 'hide' }
+                        id = { `${type}-panel` }
+                        key = { type }
+                        role = 'tabpanel'
+                        tabIndex = { 0 }>
+                        {selectedTab === type && (
+                            <DesktopPickerPane
+                                key = { selectedTab }
+                                onClick = { this._onPreviewClick }
+                                onDoubleClick = { this._onSubmit }
+                                onShareAudioChecked = { this._onShareAudioChecked }
+                                selectedSourceId = { selectedSource.id }
+                                sources = { sources[selectedTab as keyof typeof sources] }
+                                type = { selectedTab } />
+                        )}
+                    </div>
+                ))}
+
             </Dialog>
         );
     }
@@ -348,18 +358,20 @@ class DesktopPicker extends PureComponent<IProps, IState> {
                 type => {
                     return {
                         accessibilityLabel: t(TAB_LABELS[type as keyof typeof TAB_LABELS]),
-                        id: type,
+                        id: `${type}`,
+                        controlsId: `${type}-panel`,
                         label: t(TAB_LABELS[type as keyof typeof TAB_LABELS])
                     };
                 });
 
         return (
             <Tabs
-                accessibilityLabel = ''
+                accessibilityLabel = { t('dialog.sharingTabs') }
                 className = 'desktop-picker-tabs-container'
                 onChange = { this._onTabSelected }
-                selected = { this.state.selectedTab }
-                tabs = { tabs } />);
+                selected = { `${this.state.selectedTab}` }
+                tabs = { tabs } />
+        );
     }
 
     /**
