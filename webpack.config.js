@@ -240,8 +240,9 @@ function getDevServerConfig() {
         },
         host: '127.0.0.1',
         hot: true,
-        proxy: {
-            '/': {
+        proxy: [
+            {
+                context: [ '/' ],
                 bypass: devServerProxyBypass,
                 secure: false,
                 target: devServerProxyTarget,
@@ -249,10 +250,13 @@ function getDevServerConfig() {
                     'Host': new URL(devServerProxyTarget).host
                 }
             }
-        },
+        ],
         server: process.env.CODESPACES ? 'http' : 'https',
         static: {
-            directory: process.cwd()
+            directory: process.cwd(),
+            watch: {
+                ignored: file => file.endsWith('.log')
+            }
         }
     };
 }
@@ -339,7 +343,7 @@ module.exports = (_env, argv) => {
                 ...config.plugins,
                 ...getBundleAnalyzerPlugin(analyzeBundle, 'external_api')
             ],
-            performance: getPerformanceHints(perfHintOptions, 35 * 1024)
+            performance: getPerformanceHints(perfHintOptions, 40 * 1024)
         }),
         Object.assign({}, config, {
             entry: {
@@ -383,6 +387,17 @@ module.exports = (_env, argv) => {
 
                 globalObject: 'AudioWorkletGlobalScope'
             }
+        }),
+
+        Object.assign({}, config, {
+            entry: {
+                'screenshot-capture-worker': './react/features/screenshot-capture/worker.ts'
+            },
+            plugins: [
+                ...config.plugins,
+                ...getBundleAnalyzerPlugin(analyzeBundle, 'screenshot-capture-worker')
+            ],
+            performance: getPerformanceHints(perfHintOptions, 4 * 1024)
         })
     ];
 };

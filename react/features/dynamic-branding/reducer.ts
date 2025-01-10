@@ -146,9 +146,11 @@ export interface IDynamicBrandingState {
     avatarBackgrounds: string[];
     backgroundColor: string;
     backgroundImageUrl: string;
+    brandedIcons?: Record<string, string>;
     customizationFailed: boolean;
     customizationReady: boolean;
     defaultBranding: boolean;
+    defaultTranscriptionLanguage?: boolean;
     didPageUrl: string;
     inviteDomain: string;
     labels: Object | null;
@@ -156,7 +158,9 @@ export interface IDynamicBrandingState {
     logoImageUrl: string;
     muiBrandedTheme?: boolean;
     premeetingBackground: string;
+    sharedVideoAllowedURLDomains?: Array<string>;
     showGiphyIntegration?: boolean;
+    supportUrl?: string;
     useDynamicBrandingData: boolean;
     virtualBackgrounds: Array<Image>;
 }
@@ -171,6 +175,7 @@ ReducerRegistry.register<IDynamicBrandingState>(STORE_NAME, (state = DEFAULT_STA
             avatarBackgrounds,
             backgroundColor,
             backgroundImageUrl,
+            brandedIcons,
             defaultBranding,
             didPageUrl,
             inviteDomain,
@@ -179,7 +184,9 @@ ReducerRegistry.register<IDynamicBrandingState>(STORE_NAME, (state = DEFAULT_STA
             logoImageUrl,
             muiBrandedTheme,
             premeetingBackground,
+            sharedVideoAllowedURLDomains,
             showGiphyIntegration,
+            supportUrl,
             virtualBackgrounds
         } = action.value;
 
@@ -187,6 +194,7 @@ ReducerRegistry.register<IDynamicBrandingState>(STORE_NAME, (state = DEFAULT_STA
             avatarBackgrounds,
             backgroundColor,
             backgroundImageUrl,
+            brandedIcons,
             defaultBranding,
             didPageUrl,
             inviteDomain,
@@ -195,7 +203,9 @@ ReducerRegistry.register<IDynamicBrandingState>(STORE_NAME, (state = DEFAULT_STA
             logoImageUrl,
             muiBrandedTheme,
             premeetingBackground,
+            sharedVideoAllowedURLDomains,
             showGiphyIntegration,
+            supportUrl,
             customizationFailed: false,
             customizationReady: true,
             useDynamicBrandingData: true,
@@ -227,7 +237,7 @@ ReducerRegistry.register<IDynamicBrandingState>(STORE_NAME, (state = DEFAULT_STA
  * Transforms the branding images into an array of Images objects ready
  * to be used as virtual backgrounds.
  *
- * @param {Array<string>} images -
+ * @param {Array<string>} images - The branding images.
  * @private
  * @returns {{Props}}
  */

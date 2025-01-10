@@ -21,13 +21,13 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
+import com.facebook.hermes.reactexecutor.HermesExecutorFactory;
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.common.LifecycleState;
-import com.facebook.react.jscexecutor.JSCExecutorFactory;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.facebook.react.uimanager.ViewManager;
 import com.oney.WebRTCModule.EglUtils;
@@ -37,6 +37,7 @@ import com.oney.WebRTCModule.webrtcutils.H264AndSoftwareVideoEncoderFactory;
 
 import org.devio.rn.splashscreen.SplashScreenModule;
 import org.webrtc.EglBase;
+import org.webrtc.Logging;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -105,7 +106,7 @@ class ReactInstanceManagerHolder {
             new com.oney.WebRTCModule.WebRTCModulePackage(),
             new com.swmansion.gesturehandler.RNGestureHandlerPackage(),
             new org.linusu.RNGetRandomValuesPackage(),
-            new com.rnimmersive.RNImmersivePackage(),
+            new com.rnimmersivemode.RNImmersiveModePackage(),
             new com.swmansion.rnscreens.RNScreensPackage(),
             new com.zmxv.RNSound.RNSoundPackage(),
             new com.th3rdwave.safeareacontext.SafeAreaContextPackage(),
@@ -155,11 +156,6 @@ class ReactInstanceManagerHolder {
         return packages;
     }
 
-    static JSCExecutorFactory getReactNativeJSFactory() {
-        // Keep on using JSC, the jury is out on Hermes.
-        return new JSCExecutorFactory("", "");
-    }
-
     /**
      * Helper function to send an event to JavaScript.
      *
@@ -204,18 +200,6 @@ class ReactInstanceManagerHolder {
                 ? reactContext.getNativeModule(nativeModuleClass) : null;
     }
 
-    /**
-     * Gets the current {@link Activity} linked to React Native.
-     *
-     * @return An activity attached to React Native.
-     */
-    static Activity getCurrentActivity() {
-        ReactContext reactContext
-            = reactInstanceManager != null
-            ? reactInstanceManager.getCurrentReactContext() : null;
-        return reactContext != null ? reactContext.getCurrentActivity() : null;
-    }
-
     static ReactInstanceManager getReactInstanceManager() {
         return reactInstanceManager;
     }
@@ -240,6 +224,8 @@ class ReactInstanceManagerHolder {
 
         options.videoDecoderFactory = new H264AndSoftwareVideoDecoderFactory(eglContext);
         options.videoEncoderFactory = new H264AndSoftwareVideoEncoderFactory(eglContext);
+        options.enableMediaProjectionService = true;
+//      options.loggingSeverity = Logging.Severity.LS_INFO;
 
         Log.d(TAG, "initializing RN with Activity");
 
@@ -249,7 +235,7 @@ class ReactInstanceManagerHolder {
                 .setCurrentActivity(activity)
                 .setBundleAssetName("index.android.bundle")
                 .setJSMainModulePath("index.android")
-                .setJavaScriptExecutorFactory(getReactNativeJSFactory())
+                .setJavaScriptExecutorFactory(new HermesExecutorFactory())
                 .addPackages(getReactNativePackages())
                 .setUseDeveloperSupport(BuildConfig.DEBUG)
                 .setInitialLifecycleState(LifecycleState.RESUMED)

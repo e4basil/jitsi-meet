@@ -107,8 +107,8 @@ var interfaceConfig = {
     // Names of browsers which should show a warning stating the current browser
     // has a suboptimal experience. Browsers which are not listed as optimal or
     // unsupported are considered suboptimal. Valid values are:
-    // chrome, chromium, edge, electron, firefox, nwjs, opera, safari
-    OPTIMAL_BROWSERS: [ 'chrome', 'chromium', 'firefox', 'nwjs', 'electron', 'safari' ],
+    // chrome, chromium, electron, firefox , safari, webkit
+    OPTIMAL_BROWSERS: [ 'chrome', 'chromium', 'firefox', 'electron', 'safari', 'webkit' ],
 
     POLICY_LOGO: null,
     PROVIDER_NAME: 'Jitsi',
@@ -227,7 +227,7 @@ var interfaceConfig = {
     /**
      * Specify custom URL for downloading f droid app.
      */
-    // MOBILE_DOWNLOAD_LINK_F_DROID: 'https://f-droid.org/en/packages/org.jitsi.meet/',
+    // MOBILE_DOWNLOAD_LINK_F_DROID: 'https://f-droid.org/packages/org.jitsi.meet/',
 
     // Connection indicators (
     // CONNECTION_INDICATOR_AUTO_HIDE_ENABLED,
