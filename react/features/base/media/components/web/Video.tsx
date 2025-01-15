@@ -1,6 +1,7 @@
 import React, { Component, ReactEventHandler } from 'react';
 
 import { ITrack } from '../../../tracks/types';
+import logger from '../../logger';
 
 /**
  * The type of the React {@code Component} props of {@link Video}.
@@ -227,21 +228,23 @@ class Video extends Component<IProps> {
             this._videoElement.onplaying = this._onVideoPlaying;
         }
 
-        this._attachTrack(this.props.videoTrack);
+        this._attachTrack(this.props.videoTrack).finally(() => {
+            if (this._videoElement && this.props.autoPlay) {
+                // Ensure the video gets play() called on it. This may be necessary in the
+                // case where the local video container was moved and re-attached, in which
+                // case video does not autoplay.
 
-        if (this._videoElement && this.props.autoPlay) {
-            // Ensure the video gets play() called on it. This may be necessary in the
-            // case where the local video container was moved and re-attached, in which
-            // case video does not autoplay.
-            this._videoElement.play()
+                this._videoElement.play()
                 .catch(error => {
                     // Prevent uncaught "DOMException: The play() request was interrupted by a new load request"
                     // when video playback takes long to start and it starts after the component was unmounted.
                     if (this._mounted) {
-                        throw error;
+                        logger.error(`Error while trying to play video with id ${
+                            this.props.id} and video track ${this.props.videoTrack?.jitsiTrack}: ${error}`);
                     }
                 });
-        }
+            }
+        });
     }
 
     /**
@@ -271,7 +274,12 @@ class Video extends Component<IProps> {
 
         if (currentJitsiTrack !== nextJitsiTrack) {
             this._detachTrack(this.props.videoTrack);
-            this._attachTrack(nextProps.videoTrack);
+            this._attachTrack(nextProps.videoTrack).catch((_error: Error) => {
+                // Ignore the error. We are already logging it.
+            });
+
+            // NOTE: We may want to consider calling .play() explicitly in this case if any issues araise in future.
+            // For now it seems we are good with the autoplay attribute of the video element.
         }
 
         if (this.props.style !== nextProps.style || this.props.className !== nextProps.className) {
@@ -321,11 +329,22 @@ class Video extends Component<IProps> {
      * @returns {void}
      */
     _attachTrack(videoTrack?: Partial<ITrack>) {
+        const { id } = this.props;
+
         if (!videoTrack?.jitsiTrack) {
-            return;
+            logger.warn(`Attach is called on video element ${id} without tracks passed!`);
+
+            // returning Promise.resolve just keep the previous logic.
+            // TODO: Check if it make sense to call play on this element or we can just return promise.reject().
+            return Promise.resolve();
         }
 
-        videoTrack.jitsiTrack.attach(this._videoElement);
+        return videoTrack.jitsiTrack.attach(this._videoElement)
+            .catch((error: Error) => {
+                logger.error(
+                    `Attaching the remote track ${videoTrack.jitsiTrack} to video with id ${id} has failed with `,
+                    error);
+            });
     }
 
     /**
@@ -339,7 +358,7 @@ class Video extends Component<IProps> {
      * @returns {void}
      */
     _detachTrack(videoTrack?: Partial<ITrack>) {
-        if (this._videoElement && videoTrack && videoTrack.jitsiTrack) {
+        if (this._videoElement && videoTrack?.jitsiTrack) {
             videoTrack.jitsiTrack.detach(this._videoElement);
         }
     }

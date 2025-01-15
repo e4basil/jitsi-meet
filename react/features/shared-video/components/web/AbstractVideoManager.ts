@@ -1,6 +1,6 @@
 // @ts-expect-error
 import Logger from '@jitsi/logger';
-import throttle from 'lodash/throttle';
+import { throttle } from 'lodash-es';
 import { PureComponent } from 'react';
 
 import { createSharedVideoEvent as createEvent } from '../../../analytics/AnalyticsEvents';
@@ -15,7 +15,7 @@ import { showWarningNotification } from '../../../notifications/actions';
 import { NOTIFICATION_TIMEOUT_TYPE } from '../../../notifications/constants';
 import { dockToolbox } from '../../../toolbox/actions';
 import { muteLocal } from '../../../video-menu/actions.any';
-import { setSharedVideoStatus, stopSharedVideo } from '../../actions.any';
+import { setSharedVideoStatus, stopSharedVideo } from '../../actions';
 import { PLAYBACK_STATUSES } from '../../constants';
 
 const logger = Logger.getLogger(__filename);

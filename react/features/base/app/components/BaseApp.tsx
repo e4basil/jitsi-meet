@@ -1,6 +1,6 @@
 // @ts-expect-error
 import { jitsiLocalStorage } from '@jitsi/js-utils';
-import _ from 'lodash';
+import { isEqual } from 'lodash-es';
 import React, { Component, ComponentType, Fragment } from 'react';
 import { I18nextProvider } from 'react-i18next';
 import { Provider } from 'react-redux';
@@ -14,7 +14,6 @@ import PersistenceRegistry from '../../redux/PersistenceRegistry';
 import ReducerRegistry from '../../redux/ReducerRegistry';
 import StateListenerRegistry from '../../redux/StateListenerRegistry';
 import SoundCollection from '../../sounds/components/SoundCollection';
-import { createDeferred } from '../../util/helpers';
 import { appWillMount, appWillUnmount } from '../actions';
 import logger from '../logger';
 
@@ -46,9 +45,7 @@ export default class BaseApp<P> extends Component<P, IState> {
     /**
      * The deferred for the initialisation {{promise, resolve, reject}}.
      */
-    _init: {
-        promise: Promise<any>;
-    };
+    _init: PromiseWithResolvers<any>;
 
     /**
      * Initializes a new {@code BaseApp} instance.
@@ -79,7 +76,7 @@ export default class BaseApp<P> extends Component<P, IState> {
          * @see {@link #_initStorage}
          * @type {Promise}
          */
-        this._init = createDeferred();
+        this._init = Promise.withResolvers();
 
         try {
             await this._initStorage();
@@ -254,7 +251,7 @@ export default class BaseApp<P> extends Component<P, IState> {
         href?: string;
         props?: Object;
     }): Promise<any> {
-        if (_.isEqual(route, this.state.route)) {
+        if (isEqual(route, this.state.route)) {
             return Promise.resolve();
         }
 
