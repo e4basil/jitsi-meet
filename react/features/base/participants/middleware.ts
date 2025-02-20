@@ -2,26 +2,25 @@ import i18n from 'i18next';
 import { batch } from 'react-redux';
 import { AnyAction } from 'redux';
 
-// @ts-expect-error
-import UIEvents from '../../../../service/UI/UIEvents';
 import { IStore } from '../../app/types';
-import { approveParticipant } from '../../av-moderation/actions';
+import { approveParticipant, approveParticipantAudio, approveParticipantVideo } from '../../av-moderation/actions';
 import { UPDATE_BREAKOUT_ROOMS } from '../../breakout-rooms/actionTypes';
 import { getBreakoutRooms } from '../../breakout-rooms/functions';
 import { toggleE2EE } from '../../e2ee/actions';
 import { MAX_MODE } from '../../e2ee/constants';
-import { showNotification } from '../../notifications/actions';
+import { hideNotification, showNotification } from '../../notifications/actions';
 import {
     LOCAL_RECORDING_NOTIFICATION_ID,
     NOTIFICATION_TIMEOUT_TYPE,
     RAISE_HAND_NOTIFICATION_ID
 } from '../../notifications/constants';
+import { open as openParticipantsPane } from '../../participants-pane/actions';
 import { isForceMuted } from '../../participants-pane/functions';
 import { CALLING, INVITED } from '../../presence-status/constants';
 import { RAISE_HAND_SOUND_ID } from '../../reactions/constants';
 import { RECORDING_OFF_SOUND_ID, RECORDING_ON_SOUND_ID } from '../../recording/constants';
 import { APP_WILL_MOUNT, APP_WILL_UNMOUNT } from '../app/actionTypes';
-import { CONFERENCE_WILL_JOIN } from '../conference/actionTypes';
+import { CONFERENCE_JOINED, CONFERENCE_WILL_JOIN } from '../conference/actionTypes';
 import { forEachConference, getCurrentConference } from '../conference/functions';
 import { IJitsiConference } from '../conference/reducer';
 import { SET_CONFIG } from '../config/actionTypes';
@@ -41,7 +40,6 @@ import {
     MUTE_REMOTE_PARTICIPANT,
     OVERWRITE_PARTICIPANTS_NAMES,
     OVERWRITE_PARTICIPANT_NAME,
-    PARTICIPANT_DISPLAY_NAME_CHANGED,
     PARTICIPANT_JOINED,
     PARTICIPANT_LEFT,
     PARTICIPANT_UPDATED,
@@ -204,6 +202,28 @@ MiddlewareRegistry.register(store => next => action => {
         return result;
     }
 
+    case CONFERENCE_JOINED: {
+        const result = next(action);
+
+        const state = store.getState();
+        const { startSilent } = state['features/base/config'];
+
+        if (startSilent) {
+            const localId = getLocalParticipant(store.getState())?.id;
+
+            if (localId) {
+                store.dispatch(participantUpdated({
+                    id: localId,
+                    local: true,
+                    isSilent: startSilent
+                }));
+            }
+        }
+
+        return result;
+    }
+
+
     case SET_LOCAL_PARTICIPANT_RECORDING_STATUS: {
         const state = store.getState();
         const { recording, onlySelf } = action;
@@ -234,29 +254,13 @@ MiddlewareRegistry.register(store => next => action => {
         break;
     }
 
-    // TODO Remove this middleware when the local display name update flow is
-    // fully brought into redux.
-    case PARTICIPANT_DISPLAY_NAME_CHANGED: {
-        if (typeof APP !== 'undefined') {
-            const participant = getLocalParticipant(store.getState());
-
-            if (participant && participant.id === action.id) {
-                APP.UI.emitEvent(UIEvents.NICKNAME_CHANGED, action.name);
-            }
-        }
-
-        break;
-    }
-
     case RAISE_HAND_UPDATED: {
         const { participant } = action;
         let queue = getRaiseHandsQueue(store.getState());
 
         if (participant.raisedHandTimestamp) {
-            queue.push({
-                id: participant.id,
-                raisedHandTimestamp: participant.raisedHandTimestamp
-            });
+            queue = [ ...queue, { id: participant.id,
+                raisedHandTimestamp: participant.raisedHandTimestamp } ];
 
             // sort the queue before adding to store.
             queue = queue.sort(({ raisedHandTimestamp: a }, { raisedHandTimestamp: b }) => a - b);
@@ -450,7 +454,7 @@ StateListenerRegistry.register(
                         features: { 'screen-sharing': true }
                     })),
                 'localRecording': (participant: IJitsiParticipant, value: string) =>
-                    _localRecordingUpdated(store, conference, participant.getId(), value),
+                    _localRecordingUpdated(store, conference, participant.getId(), Boolean(value)),
                 'raisedHand': (participant: IJitsiParticipant, value: string) =>
                     _raiseHandUpdated(store, conference, participant.getId(), value),
                 'region': (participant: IJitsiParticipant, value: string) =>
@@ -683,7 +687,7 @@ function _participantJoinedOrUpdated(store: IStore, next: Function, action: AnyA
 
     // Only run this if the config is populated, otherwise we preload external resources
     // even if disableThirdPartyRequests is set to true in config
-    if (Object.keys(getState()['features/base/config']).length) {
+    if (getState()['features/base/config']?.hosts) {
         const { disableThirdPartyRequests } = getState()['features/base/config'];
 
         if (!disableThirdPartyRequests && (avatarURL || email || id || name)) {
@@ -710,8 +714,13 @@ function _participantJoinedOrUpdated(store: IStore, next: Function, action: AnyA
  * @returns {void}
  */
 function _localRecordingUpdated({ dispatch, getState }: IStore, conference: IJitsiConference,
-        participantId: string, newValue: string) {
+        participantId: string, newValue: boolean) {
     const state = getState();
+    const participant = getParticipantById(state, participantId);
+
+    if (participant?.localRecording === newValue) {
+        return;
+    }
 
     dispatch(participantUpdated({
         conference,
@@ -773,17 +782,49 @@ function _raiseHandUpdated({ dispatch, getState }: IStore, conference: IJitsiCon
 
     const isModerator = isLocalParticipantModerator(state);
     const participant = getParticipantById(state, participantId);
-    let shouldDisplayAllowAction = false;
+    let shouldDisplayAllowAudio = false;
+    let shouldDisplayAllowVideo = false;
 
     if (isModerator) {
-        shouldDisplayAllowAction = isForceMuted(participant, MEDIA_TYPE.AUDIO, state)
-            || isForceMuted(participant, MEDIA_TYPE.VIDEO, state);
+        shouldDisplayAllowAudio = isForceMuted(participant, MEDIA_TYPE.AUDIO, state);
+        shouldDisplayAllowVideo = isForceMuted(participant, MEDIA_TYPE.VIDEO, state);
     }
 
-    const action = shouldDisplayAllowAction ? {
-        customActionNameKey: [ 'notify.allowAction' ],
-        customActionHandler: [ () => dispatch(approveParticipant(participantId)) ]
-    } : {};
+    let action;
+
+    if (shouldDisplayAllowAudio || shouldDisplayAllowVideo) {
+        action = {
+            customActionNameKey: [] as string[],
+            customActionHandler: [] as Function[]
+        };
+
+        if (shouldDisplayAllowAudio) {
+            action.customActionNameKey.push('notify.allowAudio');
+            action.customActionHandler.push(() => {
+                dispatch(approveParticipantAudio(participantId));
+                dispatch(hideNotification(RAISE_HAND_NOTIFICATION_ID));
+            });
+        }
+        if (shouldDisplayAllowVideo) {
+            action.customActionNameKey.push('notify.allowVideo');
+            action.customActionHandler.push(() => {
+                dispatch(approveParticipantVideo(participantId));
+                dispatch(hideNotification(RAISE_HAND_NOTIFICATION_ID));
+            });
+        }
+        if (shouldDisplayAllowAudio && shouldDisplayAllowVideo) {
+            action.customActionNameKey.push('notify.allowBoth');
+            action.customActionHandler.push(() => {
+                dispatch(approveParticipant(participantId));
+                dispatch(hideNotification(RAISE_HAND_NOTIFICATION_ID));
+            });
+        }
+    } else {
+        action = {
+            customActionNameKey: [ 'notify.viewParticipants' ],
+            customActionHandler: [ () => dispatch(openParticipantsPane()) ]
+        };
+    }
 
     if (raisedHandTimestamp) {
         let notificationTitle;
@@ -807,7 +848,7 @@ function _raiseHandUpdated({ dispatch, getState }: IStore, conference: IJitsiCon
             concatText: true,
             uid: RAISE_HAND_NOTIFICATION_ID,
             ...action
-        }, shouldDisplayAllowAction ? NOTIFICATION_TIMEOUT_TYPE.MEDIUM : NOTIFICATION_TIMEOUT_TYPE.SHORT));
+        }, NOTIFICATION_TIMEOUT_TYPE.MEDIUM));
         dispatch(playSound(RAISE_HAND_SOUND_ID));
     }
 }

@@ -11,9 +11,9 @@ export interface IEvent {
 
 interface IOptions {
     amplitudeAPPKey?: string;
+    amplitudeIncludeUTM?: boolean;
     blackListedEvents?: string[];
     envType?: string;
-    googleAnalyticsTrackingId?: string;
     group?: string;
     host?: string;
     matomoEndpoint?: string;

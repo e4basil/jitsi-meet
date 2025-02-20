@@ -561,8 +561,6 @@
         "youtubeTerms": "Uvjeti YouTube usluge"
     },
     "lobby": {
-        "admit": "Prihvati",
-        "admitAll": "Prihvati sve",
         "allow": "Dopusti",
         "backToKnockModeButton": "Zatraži pridruživanje",
         "chat": "Chat",
@@ -597,8 +595,6 @@
         "notificationTitle": "Predvorje",
         "passwordField": "Upiši lozinku sastanka",
         "passwordJoinButton": "Pridruži se",
-        "reject": "Odbij",
-        "rejectAll": "Odbij sve",
         "title": "Predvorje",
         "toggleLabel": "Uključi predvorje"
     },
@@ -725,6 +721,8 @@
     },
     "participantsPane": {
         "actions": {
+            "admit": "Prihvati",
+            "admitAll": "Prihvati sve",
             "allow": "Dozvoli sudionicima da:",
             "allowVideo": "Dozvole video",
             "askUnmute": "Zatraže isključivanje zvuka",
@@ -737,6 +735,7 @@
             "mute": "Isključe zvuk",
             "muteAll": "Isključe zvuk svih sudionika",
             "muteEveryoneElse": "Isključe zvuk svih drugih",
+            "reject": "Odbij",
             "stopEveryonesVideo": "Prekinu videa svih",
             "stopVideo": "Prekinu video",
             "unblockEveryoneMicCamera": "Deblokiraju mikrofone i kamere svih sudionika",
@@ -770,6 +769,9 @@
             "questionPlaceholder": "Postavi pitanje",
             "removeOption": "Ukloni opciju",
             "send": "Pošalji"
+        },
+        "errors": {
+            "notUniqueOption": "Opcije moraju biti jedinstvene"
         },
         "notification": {
             "description": "Za glasanje otvori karticu ankete",
@@ -1034,6 +1036,7 @@
         "neutral": "Neutralan",
         "sad": "Žalostan",
         "search": "Traži",
+        "searchHint": "Traži sudionike",
         "seconds": "{{count}} s",
         "speakerStats": "Statistika govornika",
         "speakerTime": "Vrijeme govornika",
@@ -1231,16 +1234,7 @@
         "tr": "TR"
     },
     "userMedia": {
-        "androidGrantPermissions": "Odaberi <b><i>Dozvoli</i></b> kad tvoj preglednik zatraži dozvole.",
-        "chromeGrantPermissions": "Odaberi <b><i>Dozvoli</i></b> kad tvoj preglednik zatraži dozvole.",
-        "edgeGrantPermissions": "Odaberi <b><i>Da</i></b> kad tvoj preglednik zatraži dozvole.",
-        "electronGrantPermissions": "Pokušaj pristupa tvojoj kameri i mikrofonu",
-        "firefoxGrantPermissions": "Odaberi <b><i>Dijeli odabrane uređaje</i></b> kad tvoj preglednik zatraži dozvole.",
-        "iexplorerGrantPermissions": "Odaberi <b><i>U redu</i></b> kad tvoj preglednik zatraži dozvole.",
-        "nwjsGrantPermissions": "Dozvoli pristup tvojoj kameri i mikrofonu",
-        "operaGrantPermissions": "Odaberi <b><i>Dozvoli</i></b> kad tvoj preglednik zatraži dozvole.",
-        "react-nativeGrantPermissions": "Odaberi <b><i>Dozvoli</i></b> kad tvoj preglednik zatraži dozvole.",
-        "safariGrantPermissions": "Odaberi <b><i>U redu</i></b> kad tvoj preglednik zatraži dozvole."
+        "grantPermissions": "Dozvoli pristup tvojoj kameri i mikrofonu."
     },
     "videoSIPGW": {
         "busy": "Radimo na oslobađanju resursa. Pokušaj ponovo za par minuta.",

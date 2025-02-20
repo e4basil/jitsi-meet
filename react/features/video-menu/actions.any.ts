@@ -1,5 +1,3 @@
-// @ts-expect-error
-import UIEvents from '../../../service/UI/UIEvents';
 import {
     AUDIO_MUTE,
     VIDEO_MUTE,
@@ -13,7 +11,7 @@ import { shouldShowModeratedNotification } from '../av-moderation/functions';
 import { setAudioMuted, setVideoMuted } from '../base/media/actions';
 import { MEDIA_TYPE, MediaType, VIDEO_MUTISM_AUTHORITY } from '../base/media/constants';
 import { muteRemoteParticipant } from '../base/participants/actions';
-import { getLocalParticipant, getRemoteParticipants } from '../base/participants/functions';
+import { getRemoteParticipants } from '../base/participants/functions';
 import { toggleScreensharing } from '../base/tracks/actions';
 import { isModerationNotificationDisplayed } from '../notifications/functions';
 
@@ -38,7 +36,7 @@ export function muteLocal(enable: boolean, mediaType: MediaType, stopScreenShari
         }
 
         // check for A/V Moderation when trying to unmute
-        if (!enable && shouldShowModeratedNotification(MEDIA_TYPE.AUDIO, getState())) {
+        if (isAudio && !enable && shouldShowModeratedNotification(MEDIA_TYPE.AUDIO, getState())) {
             if (!isModerationNotificationDisplayed(MEDIA_TYPE.AUDIO, getState())) {
                 dispatch(showModeratedNotification(MEDIA_TYPE.AUDIO));
             }
@@ -55,8 +53,9 @@ export function muteLocal(enable: boolean, mediaType: MediaType, stopScreenShari
             : setVideoMuted(enable, VIDEO_MUTISM_AUTHORITY.USER, /* ensureTrack */ true));
 
         // FIXME: The old conference logic still relies on this event being emitted.
-        typeof APP === 'undefined'
-            || APP.UI.emitEvent(isAudio ? UIEvents.AUDIO_MUTED : UIEvents.VIDEO_MUTED, enable);
+        if (typeof APP !== 'undefined') {
+            isAudio ? APP.conference.muteAudio(enable) : APP.conference.muteVideo(enable, false);
+        }
     };
 }
 
@@ -89,11 +88,6 @@ export function muteRemote(participantId: string, mediaType: MediaType) {
 export function muteAllParticipants(exclude: Array<string>, mediaType: MediaType) {
     return (dispatch: IStore['dispatch'], getState: IStore['getState']) => {
         const state = getState();
-        const localId = getLocalParticipant(state)?.id ?? '';
-
-        if (!exclude.includes(localId)) {
-            dispatch(muteLocal(true, mediaType, mediaType !== MEDIA_TYPE.AUDIO));
-        }
 
         getRemoteParticipants(state).forEach((p, id) => {
             if (exclude.includes(id)) {
@@ -109,4 +103,3 @@ export function muteAllParticipants(exclude: Array<string>, mediaType: MediaType
         });
     };
 }
-

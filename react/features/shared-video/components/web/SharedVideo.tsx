@@ -4,9 +4,11 @@ import { connect } from 'react-redux';
 // @ts-expect-error
 import Filmstrip from '../../../../../modules/UI/videolayout/Filmstrip';
 import { IReduxState } from '../../../app/types';
-import { getLocalParticipant } from '../../../base/participants/functions';
+import { FakeParticipant } from '../../../base/participants/types';
 import { getVerticalViewMaxWidth } from '../../../filmstrip/functions.web';
+import { getLargeVideoParticipant } from '../../../large-video/functions';
 import { getToolboxHeight } from '../../../toolbox/functions.web';
+import { isSharedVideoEnabled, isVideoPlaying } from '../../functions';
 
 import VideoManager from './VideoManager';
 import YoutubeVideoManager from './YoutubeVideoManager';
@@ -34,14 +36,24 @@ interface IProps {
     filmstripWidth: number;
 
     /**
-     * Is the video shared by the local user.
+     * Whether the shared video is enabled or not.
      */
-    isOwner: boolean;
+    isEnabled: boolean;
 
     /**
-     * Whether or not the user is actively resizing the filmstrip.
+     * Whether the user is actively resizing the filmstrip.
      */
     isResizing: boolean;
+
+    /**
+     * Whether the shared video is currently playing.
+     */
+    isVideoShared: boolean;
+
+    /**
+     * Whether the shared video should be shown on stage.
+     */
+    onStage: boolean;
 
     /**
      * The shared video url.
@@ -118,14 +130,23 @@ class SharedVideo extends Component<IProps> {
      * @returns {React$Element}
      */
     render() {
-        const { isOwner, isResizing } = this.props;
-        const className = !isResizing && isOwner ? '' : 'disable-pointer';
+        const { isEnabled, isResizing, isVideoShared, onStage } = this.props;
+
+        if (!isEnabled || !isVideoShared) {
+            return null;
+        }
+
+        const style: any = this.getDimensions();
+
+        if (!onStage) {
+            style.display = 'none';
+        }
 
         return (
             <div
-                className = { className }
+                className = { (isResizing && 'disable-pointer') || '' }
                 id = 'sharedVideo'
-                style = { this.getDimensions() }>
+                style = { style }>
                 {this.getManager()}
             </div>
         );
@@ -141,19 +162,21 @@ class SharedVideo extends Component<IProps> {
  * @returns {IProps}
  */
 function _mapStateToProps(state: IReduxState) {
-    const { ownerId, videoUrl } = state['features/shared-video'];
+    const { videoUrl } = state['features/shared-video'];
     const { clientHeight, clientWidth } = state['features/base/responsive-ui'];
     const { visible, isResizing } = state['features/filmstrip'];
-
-    const localParticipant = getLocalParticipant(state);
+    const onStage = getLargeVideoParticipant(state)?.fakeParticipant === FakeParticipant.SharedVideo;
+    const isVideoShared = isVideoPlaying(state);
 
     return {
         clientHeight,
         clientWidth,
         filmstripVisible: visible,
         filmstripWidth: getVerticalViewMaxWidth(state),
-        isOwner: ownerId === localParticipant?.id,
+        isEnabled: isSharedVideoEnabled(state),
         isResizing,
+        isVideoShared,
+        onStage,
         videoUrl
     };
 }

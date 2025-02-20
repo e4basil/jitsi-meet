@@ -1,3 +1,5 @@
+import extraInterfaceConfigWhitelistCopy from './extraInterfaceConfigWhitelist';
+
 /**
  * The interface config keys to whitelist, the keys that can be overridden.
  *
@@ -20,19 +22,15 @@ export default [
     'DISABLE_DOMINANT_SPEAKER_INDICATOR',
     'DISABLE_FOCUS_INDICATOR',
     'DISABLE_PRIVATE_MESSAGES',
-    'DISABLE_RINGING',
     'DISABLE_TRANSCRIPTION_SUBTITLES',
     'DISABLE_VIDEO_BACKGROUND',
     'DISPLAY_WELCOME_PAGE_CONTENT',
     'ENABLE_DIAL_OUT',
-    'ENABLE_FEEDBACK_ANIMATION',
     'FILM_STRIP_MAX_HEIGHT',
     'GENERATE_ROOMNAMES_ON_WELCOME_PAGE',
-    'HIDE_INVITE_MORE_HEADER',
     'INDICATOR_FONT_SIZES',
     'INITIAL_TOOLBAR_TIMEOUT',
     'LANG_DETECTION',
-    'LIVE_STREAMING_HELP_LINK',
     'LOCAL_THUMBNAIL_RATIO',
     'MAXIMUM_ZOOMING_COEFFICIENT',
     'NATIVE_APP_NAME',
@@ -45,7 +43,6 @@ export default [
     'SHARING_FEATURES',
     'SHOW_CHROME_EXTENSION_BANNER',
     'SHOW_POWERED_BY',
-    'SUPPORT_URL',
     'TILE_VIEW_MAX_COLUMNS',
     'TOOLBAR_ALWAYS_VISIBLE',
     'TOOLBAR_BUTTONS',
@@ -54,4 +51,4 @@ export default [
     'VERTICAL_FILMSTRIP',
     'VIDEO_LAYOUT_FIT',
     'VIDEO_QUALITY_LABEL_DISABLED'
-];
+].concat(extraInterfaceConfigWhitelistCopy);

@@ -13,7 +13,7 @@ import { SECURITY_URL } from './contants';
  *
  * @param {IReduxState} state - The redux state.
  * @param {Function} t - The translation function.
- * @param {'meeting'|'prejoin'|'welcome'} context - The given context of the warining.
+ * @param {'meeting'|'prejoin'|'welcome'} context - The given context of the warning.
  * @returns {Text}
  */
 export default function getUnsafeRoomText(state: IReduxState, t: Function, context: 'meeting' | 'prejoin' | 'welcome') {
@@ -21,6 +21,7 @@ export default function getUnsafeRoomText(state: IReduxState, t: Function, conte
     const link = React.createElement(Link, {
         url: securityUrl,
         children: 'here',
+        key: 'support-link',
         style: { color: BaseTheme.palette.action01 } });
 
     const options = {

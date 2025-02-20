@@ -6,6 +6,7 @@ import {
     SET_MEETING_HIGHLIGHT_BUTTON_STATE,
     SET_PENDING_RECORDING_NOTIFICATION_UID,
     SET_SELECTED_RECORDING_SERVICE,
+    SET_START_RECORDING_NOTIFICATION_SHOWN,
     SET_STREAM_KEY
 } from './actionTypes';
 
@@ -35,6 +36,7 @@ export interface IRecordingState {
     selectedRecordingService: string;
     sessionDatas: Array<ISessionData>;
     streamKey?: string;
+    wasStartRecordingSuggested?: boolean;
 }
 
 /**
@@ -94,6 +96,12 @@ ReducerRegistry.register<IRecordingState>(STORE_NAME,
                 disableHighlightMeetingMoment: action.disabled
             };
 
+        case SET_START_RECORDING_NOTIFICATION_SHOWN:
+            return {
+                ...state,
+                wasStartRecordingSuggested: true
+            };
+
         default:
             return state;
         }
@@ -105,7 +113,7 @@ ReducerRegistry.register<IRecordingState>(STORE_NAME,
  * @param {Array} sessionDatas - The current sessions in the redux store.
  * @param {Object} newSessionData - The updated session data.
  * @private
- * @returns {Array} The session datas with the updated session data added.
+ * @returns {Array} The session data with the updated session data added.
  */
 function _updateSessionDatas(sessionDatas: ISessionData[], newSessionData: ISessionData) {
     const hasExistingSessionData = sessionDatas.find(
@@ -125,7 +133,7 @@ function _updateSessionDatas(sessionDatas: ISessionData[], newSessionData: ISess
         });
     } else {
         // If the session data is not present, then there is nothing to update
-        // and instead it needs to be added to the known session datas.
+        // and instead it needs to be added to the known session data.
         newSessionDatas = [
             ...sessionDatas,
             { ...newSessionData }

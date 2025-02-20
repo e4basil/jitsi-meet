@@ -1,7 +1,6 @@
 import { IStore } from '../app/types';
 import { getLocalJitsiAudioTrack } from '../base/tracks/functions';
 import { showErrorNotification } from '../notifications/actions';
-import { NOTIFICATION_TIMEOUT_TYPE } from '../notifications/constants';
 import { NoiseSuppressionEffect } from '../stream-effects/noise-suppression/NoiseSuppressionEffect';
 
 import { SET_NOISE_SUPPRESSION_ENABLED } from './actionTypes';
@@ -56,8 +55,22 @@ export function setNoiseSuppressionEnabled(enabled: boolean): any {
 
         logger.info(`Attempting to set noise suppression enabled state: ${enabled}`);
 
+        if (enabled === noiseSuppressionEnabled) {
+            logger.warn(`Noise suppression enabled state already: ${enabled}`);
+
+            return;
+        }
+
+        // If there is no local audio, simply set the enabled state. Once an audio track is created
+        // the effects list will be applied.
+        if (!localAudio) {
+            dispatch(setNoiseSuppressionEnabledState(enabled));
+
+            return;
+        }
+
         try {
-            if (enabled && !noiseSuppressionEnabled) {
+            if (enabled) {
                 if (!canEnableNoiseSuppression(state, dispatch, localAudio)) {
                     return;
                 }
@@ -66,12 +79,10 @@ export function setNoiseSuppressionEnabled(enabled: boolean): any {
                 dispatch(setNoiseSuppressionEnabledState(true));
                 logger.info('Noise suppression enabled.');
 
-            } else if (!enabled && noiseSuppressionEnabled) {
+            } else {
                 await localAudio.setEffect(undefined);
                 dispatch(setNoiseSuppressionEnabledState(false));
                 logger.info('Noise suppression disabled.');
-            } else {
-                logger.warn(`Noise suppression enabled state already: ${enabled}`);
             }
         } catch (error) {
             logger.error(
@@ -81,7 +92,7 @@ export function setNoiseSuppressionEnabled(enabled: boolean): any {
 
             dispatch(showErrorNotification({
                 titleKey: 'notify.noiseSuppressionFailedTitle'
-            }, NOTIFICATION_TIMEOUT_TYPE.MEDIUM));
+            }));
         }
     };
 }

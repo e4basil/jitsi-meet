@@ -11,7 +11,9 @@ import {
     getUserSelectedCameraDeviceId,
     getUserSelectedMicDeviceId
 } from '../settings/functions.web';
+import { getJitsiMeetGlobalNSConnectionTimes } from '../util/helpers';
 
+import { getCameraFacingMode } from './functions.any';
 import loadEffects from './loadEffects';
 import logger from './logger';
 import { ITrackOptions } from './types';
@@ -29,20 +31,17 @@ export * from './functions.any';
  * and/or 'video'.
  * @param {string|null} [options.micDeviceId] - Microphone device id or
  * {@code undefined} to use app's settings.
- * @param {number|undefined} [oprions.timeout] - A timeout for JitsiMeetJS.createLocalTracks used to create the tracks.
- * @param {boolean} [options.firePermissionPromptIsShownEvent] - Whether lib-jitsi-meet
- * should check for a {@code getUserMedia} permission prompt and fire a
- * corresponding event.
+ * @param {number|undefined} [options.timeout] - A timeout for JitsiMeetJS.createLocalTracks used to create the tracks.
  * @param {IStore} store - The redux store in the context of which the function
  * is to execute and from which state such as {@code config} is to be retrieved.
+ * @param {boolean} recordTimeMetrics - If true time metrics will be recorded.
  * @returns {Promise<JitsiLocalTrack[]>}
  */
-export function createLocalTracksF(options: ITrackOptions = {}, store?: IStore) {
+export function createLocalTracksF(options: ITrackOptions = {}, store?: IStore, recordTimeMetrics = false) {
     let { cameraDeviceId, micDeviceId } = options;
     const {
         desktopSharingSourceDevice,
         desktopSharingSources,
-        firePermissionPromptIsShownEvent,
         timeout
     } = options;
 
@@ -61,13 +60,16 @@ export function createLocalTracksF(options: ITrackOptions = {}, store?: IStore) 
 
     const {
         desktopSharingFrameRate,
-        firefox_fake_device, // eslint-disable-line camelcase
         resolution
     } = state['features/base/config'];
     const constraints = options.constraints ?? state['features/base/config'].constraints;
 
     return (
         loadEffects(store).then((effectsArray: Object[]) => {
+            if (recordTimeMetrics) {
+                getJitsiMeetGlobalNSConnectionTimes()['trackEffects.loaded'] = window.performance.now();
+            }
+
             // Filter any undefined values returned by Promise.resolve().
             const effects = effectsArray.filter(effect => Boolean(effect));
 
@@ -82,8 +84,7 @@ export function createLocalTracksF(options: ITrackOptions = {}, store?: IStore) 
                     // Copy array to avoid mutations inside library.
                     devices: options.devices?.slice(0),
                     effects,
-                    firefox_fake_device, // eslint-disable-line camelcase
-                    firePermissionPromptIsShownEvent,
+                    facingMode: options.facingMode || getCameraFacingMode(state),
                     micDeviceId,
                     resolution,
                     timeout
@@ -138,7 +139,6 @@ export function createPrejoinTracks() {
     if (requestedAudio || requestedVideo) {
         tryCreateLocalTracks = createLocalTracksF({
             devices: initialDevices,
-            firePermissionPromptIsShownEvent: true,
             timeout
         }, APP.store)
         .catch(async (err: Error) => {
@@ -155,7 +155,6 @@ export function createPrejoinTracks() {
             if (requestedAudio) {
                 gUMPromises.push(createLocalTracksF({
                     devices: [ MEDIA_TYPE.AUDIO ],
-                    firePermissionPromptIsShownEvent: true,
                     timeout
                 }));
             }
@@ -163,7 +162,6 @@ export function createPrejoinTracks() {
             if (requestedVideo) {
                 gUMPromises.push(createLocalTracksF({
                     devices: [ MEDIA_TYPE.VIDEO ],
-                    firePermissionPromptIsShownEvent: true,
                     timeout
                 }));
             }

@@ -322,7 +322,7 @@ export function calculateResponsiveTileViewDimensions({
     for (let c = 1; c <= Math.min(maxColumns, numberOfParticipants, desiredNumberOfVisibleTiles); c++) {
         const r = Math.ceil(numberOfParticipants / c);
 
-        // we want to display as much as possible tumbnails up to desiredNumberOfVisibleTiles
+        // we want to display as much as possible thumbnails up to desiredNumberOfVisibleTiles
         const visibleRows
             = numberOfParticipants <= desiredNumberOfVisibleTiles ? r : Math.floor(desiredNumberOfVisibleTiles / c);
 
@@ -761,6 +761,18 @@ export function isStageFilmstripEnabled(state: IReduxState) {
     const { filmstrip } = state['features/base/config'];
 
     return Boolean(!filmstrip?.disableStageFilmstrip && interfaceConfig.VERTICAL_FILMSTRIP);
+}
+
+/**
+ * Whether the vertical/horizontal filmstrip is disabled.
+ *
+ * @param {Object} state - Redux state.
+ * @returns {boolean}
+ */
+export function isFilmstripDisabled(state: IReduxState) {
+    const { filmstrip } = state['features/base/config'];
+
+    return Boolean(filmstrip?.disabled);
 }
 
 /**

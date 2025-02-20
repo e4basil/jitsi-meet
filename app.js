@@ -1,4 +1,4 @@
-/* application specific logic */
+/* Jitsi Meet app main entrypoint. */
 
 // Re-export jQuery
 // FIXME: Remove this requirement from torture tests.
@@ -31,12 +31,6 @@ if (window.Olm) {
 window.APP = {
     API,
     conference,
-
-    // Used for automated performance tests.
-    connectionTimes: {
-        'index.loaded': window.indexLoadedTime
-    },
-
     translation,
     UI
 };

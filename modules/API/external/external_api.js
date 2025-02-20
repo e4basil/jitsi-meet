@@ -54,11 +54,14 @@ const commands = {
     removeBreakoutRoom: 'remove-breakout-room',
     resizeFilmStrip: 'resize-film-strip',
     resizeLargeVideo: 'resize-large-video',
+    sendCameraFacingMode: 'send-camera-facing-mode-message',
     sendChatMessage: 'send-chat-message',
     sendEndpointTextMessage: 'send-endpoint-text-message',
     sendParticipantToRoom: 'send-participant-to-room',
     sendTones: 'send-tones',
+    setAudioOnly: 'set-audio-only',
     setAssumedBandwidthBps: 'set-assumed-bandwidth-bps',
+    setBlurredBackground: 'set-blurred-background',
     setFollowMe: 'set-follow-me',
     setLargeVideoParticipant: 'set-large-video-participant',
     setMediaEncryptionKey: 'set-media-encryption-key',
@@ -67,6 +70,7 @@ const commands = {
     setSubtitles: 'set-subtitles',
     setTileView: 'set-tile-view',
     setVideoQuality: 'set-video-quality',
+    setVirtualBackground: 'set-virtual-background',
     showNotification: 'show-notification',
     startRecording: 'start-recording',
     startShareVideo: 'start-share-video',
@@ -101,16 +105,20 @@ const events = {
     'avatar-changed': 'avatarChanged',
     'audio-availability-changed': 'audioAvailabilityChanged',
     'audio-mute-status-changed': 'audioMuteStatusChanged',
+    'audio-only-changed': 'audioOnlyChanged',
     'audio-or-video-sharing-toggled': 'audioOrVideoSharingToggled',
     'breakout-rooms-updated': 'breakoutRoomsUpdated',
     'browser-support': 'browserSupport',
     'camera-error': 'cameraError',
     'chat-updated': 'chatUpdated',
+    'compute-pressure-changed': 'computePressureChanged',
+    'conference-created-timestamp': 'conferenceCreatedTimestamp',
     'content-sharing-participants-changed': 'contentSharingParticipantsChanged',
     'data-channel-closed': 'dataChannelClosed',
     'data-channel-opened': 'dataChannelOpened',
     'device-list-changed': 'deviceListChanged',
     'display-name-change': 'displayNameChange',
+    'dominant-speaker-changed': 'dominantSpeakerChanged',
     'email-change': 'emailChange',
     'error-occurred': 'errorOccurred',
     'endpoint-text-message-received': 'endpointTextMessageReceived',
@@ -128,6 +136,7 @@ const events = {
     'mouse-enter': 'mouseEnter',
     'mouse-leave': 'mouseLeave',
     'mouse-move': 'mouseMove',
+    'non-participant-message-received': 'nonParticipantMessageReceived',
     'notification-triggered': 'notificationTriggered',
     'outgoing-message': 'outgoingMessage',
     'p2p-status-changed': 'p2pStatusChanged',
@@ -141,6 +150,7 @@ const events = {
     'prejoin-screen-loaded': 'prejoinScreenLoaded',
     'proxy-connection-event': 'proxyConnectionEvent',
     'raise-hand-updated': 'raiseHandUpdated',
+    'ready': 'ready',
     'recording-link-available': 'recordingLinkAvailable',
     'recording-status-changed': 'recordingStatusChanged',
     'participant-menu-button-clicked': 'participantMenuButtonClick',
@@ -151,12 +161,17 @@ const events = {
     'video-mute-status-changed': 'videoMuteStatusChanged',
     'video-quality-changed': 'videoQualityChanged',
     'screen-sharing-status-changed': 'screenSharingStatusChanged',
-    'dominant-speaker-changed': 'dominantSpeakerChanged',
     'subject-change': 'subjectChange',
     'suspend-detected': 'suspendDetected',
     'tile-view-changed': 'tileViewChanged',
     'toolbar-button-clicked': 'toolbarButtonClicked',
+    'transcribing-status-changed': 'transcribingStatusChanged',
+    'transcription-chunk-received': 'transcriptionChunkReceived',
     'whiteboard-status-changed': 'whiteboardStatusChanged'
+};
+
+const requests = {
+    '_request-desktop-sources': '_requestDesktopSources'
 };
 
 /**
@@ -180,80 +195,6 @@ function changeParticipantNumber(APIInstance, number) {
 }
 
 /**
- * Generates the URL for the iframe.
- *
- * @param {string} domain - The domain name of the server that hosts the
- * conference.
- * @param {string} [options] - Another optional parameters.
- * @param {Object} [options.configOverwrite] - Object containing configuration
- * options defined in config.js to be overridden.
- * @param {Object} [options.interfaceConfigOverwrite] - Object containing
- * configuration options defined in interface_config.js to be overridden.
- * @param {string} [options.jwt] - The JWT token if needed by jitsi-meet for
- * authentication.
- * @param {string} [options.lang] - The meeting's default language.
- * @param {string} [options.roomName] - The name of the room to join.
- * @returns {string} The URL.
- */
-function generateURL(domain, options = {}) {
-    return urlObjectToString({
-        ...options,
-        url: `https://${domain}/#jitsi_meet_external_api_id=${id}`
-    });
-}
-
-/**
- * Parses the arguments passed to the constructor. If the old format is used
- * the function translates the arguments to the new format.
- *
- * @param {Array} args - The arguments to be parsed.
- * @returns {Object} JS object with properties.
- */
-function parseArguments(args) {
-    if (!args.length) {
-        return {};
-    }
-
-    const firstArg = args[0];
-
-    switch (typeof firstArg) {
-    case 'string': // old arguments format
-    case 'undefined': {
-        // Not sure which format but we are trying to parse the old
-        // format because if the new format is used everything will be undefined
-        // anyway.
-        const [
-            roomName,
-            width,
-            height,
-            parentNode,
-            configOverwrite,
-            interfaceConfigOverwrite,
-            jwt,
-            onload,
-            lang
-        ] = args;
-
-        return {
-            roomName,
-            width,
-            height,
-            parentNode,
-            configOverwrite,
-            interfaceConfigOverwrite,
-            jwt,
-            onload,
-            lang
-        };
-    }
-    case 'object': // new arguments format
-        return args[0];
-    default:
-        throw new Error('Can\'t parse the arguments!');
-    }
-}
-
-/**
  * Compute valid values for height and width. If a number is specified it's
  * treated as pixel units. If the value is expressed in px, em, pt or
  * percentage, it's used as is.
@@ -266,10 +207,10 @@ function parseArguments(args) {
 function parseSizeParam(value) {
     let parsedValue;
 
-    // This regex parses values of the form 100px, 100em, 100pt or 100%.
+    // This regex parses values of the form 100px, 100em, 100pt, 100vh, 100vw or 100%.
     // Values like 100 or 100px are handled outside of the regex, and
     // invalid values will be ignored and the minimum will be used.
-    const re = /([0-9]*\.?[0-9]+)(em|pt|px|%)$/;
+    const re = /([0-9]*\.?[0-9]+)(em|pt|px|((d|l|s)?v)(h|w)|%)$/;
 
     if (typeof value === 'string' && String(value).match(re) !== null) {
         parsedValue = value;
@@ -302,6 +243,9 @@ export default class JitsiMeetExternalAPI extends EventEmitter {
      * configuration options defined in config.js to be overridden.
      * @param {Object} [options.interfaceConfigOverwrite] - Object containing
      * configuration options defined in interface_config.js to be overridden.
+     * @param {IIceServers} [options.iceServers] - Object with rules that will be used to modify/remove the existing
+     * ice server configuration.
+     * NOTE: This property is currently experimental and may be removed in the future!
      * @param {string} [options.jwt] - The JWT token if needed by jitsi-meet for
      * authentication.
      * @param {string} [options.lang] - The meeting's default language.
@@ -318,7 +262,7 @@ export default class JitsiMeetExternalAPI extends EventEmitter {
      * @param {string}  [options.release] - The key used for specifying release if enabled on the backend.
      * @param {string} [options.sandbox] - Sandbox directive for the created iframe, if desired.
      */
-    constructor(domain, ...args) {
+    constructor(domain, options = {}) {
         super();
         const {
             roomName = '',
@@ -327,21 +271,24 @@ export default class JitsiMeetExternalAPI extends EventEmitter {
             parentNode = document.body,
             configOverwrite = {},
             interfaceConfigOverwrite = {},
-            jwt = undefined,
-            lang = undefined,
-            onload = undefined,
+            jwt,
+            lang,
+            onload,
             invitees,
+            iceServers,
             devices,
             userInfo,
             e2eeKey,
             release,
-            sandbox = ''
-        } = parseArguments(args);
+            sandbox
+        } = options;
         const localStorageContent = jitsiLocalStorage.getItem('jitsiLocalStorage');
 
         this._parentNode = parentNode;
-        this._url = generateURL(domain, {
+
+        this._url = urlObjectToString({
             configOverwrite,
+            iceServers,
             interfaceConfigOverwrite,
             jwt,
             lang,
@@ -351,9 +298,12 @@ export default class JitsiMeetExternalAPI extends EventEmitter {
             appData: {
                 localStorageContent
             },
-            release
+            release,
+            url: `https://${domain}/#jitsi_meet_external_api_id=${id}`
         });
-        this._createIFrame(height, width, onload, sandbox);
+
+        this._createIFrame(height, width, sandbox);
+
         this._transport = new Transport({
             backend: new PostMessageTransportBackend({
                 postisOptions: {
@@ -363,9 +313,12 @@ export default class JitsiMeetExternalAPI extends EventEmitter {
                 }
             })
         });
+
         if (Array.isArray(invitees) && invitees.length > 0) {
             this.invite(invitees);
         }
+
+        this._onload = onload;
         this._tmpE2EEKey = e2eeKey;
         this._isLargeVideoVisible = false;
         this._isPrejoinVideoVisible = false;
@@ -373,6 +326,7 @@ export default class JitsiMeetExternalAPI extends EventEmitter {
         this._participants = {};
         this._myUserID = undefined;
         this._onStageParticipant = undefined;
+        this._iAmvisitor = undefined;
         this._setupListeners();
         id++;
     }
@@ -384,18 +338,26 @@ export default class JitsiMeetExternalAPI extends EventEmitter {
      * parseSizeParam for format details.
      * @param {number|string} width - The with of the iframe. Check
      * parseSizeParam for format details.
-     * @param {Function} onload - The function that will listen
-     * for onload event.
      * @param {string} sandbox - Sandbox directive for the created iframe, if desired.
      * @returns {void}
      *
      * @private
      */
-    _createIFrame(height, width, onload, sandbox) {
+    _createIFrame(height, width, sandbox) {
         const frameName = `jitsiConferenceFrame${id}`;
 
         this._frame = document.createElement('iframe');
-        this._frame.allow = 'camera; microphone; display-capture; autoplay; clipboard-write; hid';
+        this._frame.allow = [
+            'autoplay',
+            'camera',
+            'clipboard-write',
+            'compute-pressure',
+            'display-capture',
+            'hid',
+            'microphone',
+            'screen-wake-lock',
+            'speaker-selection'
+        ].join('; ');
         this._frame.name = frameName;
         this._frame.id = frameName;
         this._setSize(height, width);
@@ -406,11 +368,6 @@ export default class JitsiMeetExternalAPI extends EventEmitter {
             this._frame.sandbox = sandbox;
         }
 
-        if (onload) {
-            // waits for iframe resources to load
-            // and fires event when it is done
-            this._frame.onload = onload;
-        }
         this._frame.src = this._url;
 
         this._frame = this._parentNode.appendChild(this._frame);
@@ -559,6 +516,12 @@ export default class JitsiMeetExternalAPI extends EventEmitter {
             const userID = data.id;
 
             switch (name) {
+            case 'ready': {
+                // Fake the iframe onload event because it's not reliable.
+                this._onload?.();
+
+                break;
+            }
             case 'video-conference-joined': {
                 if (typeof this._tmpE2EEKey !== 'undefined') {
 
@@ -585,6 +548,7 @@ export default class JitsiMeetExternalAPI extends EventEmitter {
                     email: data.email,
                     avatarURL: data.avatarURL
                 };
+                this._iAmvisitor = data.visitor;
             }
 
             // eslint-disable-next-line no-fallthrough
@@ -669,6 +633,18 @@ export default class JitsiMeetExternalAPI extends EventEmitter {
             }
 
             return false;
+        });
+
+        this._transport.on('request', (request, callback) => {
+            const requestName = requests[request.name];
+            const data = {
+                ...request,
+                name: requestName
+            };
+
+            if (requestName) {
+                this.emit(requestName, data, callback);
+            }
         });
     }
 
@@ -1123,6 +1099,15 @@ export default class JitsiMeetExternalAPI extends EventEmitter {
     }
 
     /**
+     * Returns whether we have joined as visitor in a meeting.
+     *
+     * @returns {boolean} - Returns true if we have joined as visitor.
+     */
+    isVisitor() {
+        return this._iAmvisitor;
+    }
+
+    /**
      * Returns the avatar URL of a participant.
      *
      * @param {string} participantId - The id of the participant.
@@ -1189,6 +1174,35 @@ export default class JitsiMeetExternalAPI extends EventEmitter {
     }
 
     /**
+     * Return the conference`s sessionId.
+     *
+     * @returns {Promise} - Resolves with the conference`s sessionId.
+     */
+    getSessionId() {
+        return this._transport.sendRequest({
+            name: 'session-id'
+        });
+    }
+
+    /**
+     * Returns array of commands supported by executeCommand().
+     *
+     * @returns {Array<string>} Array of commands.
+     */
+    getSupportedCommands() {
+        return Object.keys(commands);
+    }
+
+    /**
+     * Returns array of events supported by addEventListener().
+     *
+     * @returns {Array<string>} Array of events.
+     */
+    getSupportedEvents() {
+        return Object.values(events);
+    }
+
+    /**
      * Check if the video is available.
      *
      * @returns {Promise} - Resolves with true if the video available, with
@@ -1220,6 +1234,21 @@ export default class JitsiMeetExternalAPI extends EventEmitter {
     listBreakoutRooms() {
         return this._transport.sendRequest({
             name: 'list-breakout-rooms'
+        });
+    }
+
+    /**
+     * Returns the state of availability electron share screen via external api.
+     *
+     * @returns {Promise}
+     *
+     * TODO: should be removed after we make sure that all Electron clients use only versions
+     * after with the legacy SS support was removed from the electron SDK. If we remove it now the SS for Electron
+     * clients with older versions wont work.
+     */
+    _isNewElectronScreensharingSupported() {
+        return this._transport.sendRequest({
+            name: '_new_electron_screensharing_supported'
         });
     }
 
@@ -1363,6 +1392,8 @@ export default class JitsiMeetExternalAPI extends EventEmitter {
      * @param { string } options.rtmpBroadcastID - The RTMP broadcast ID.
      * @param { string } options.youtubeStreamKey - The youtube stream key.
      * @param { string } options.youtubeBroadcastID - The youtube broadcast ID.
+     * @param {Object } options.extraMetadata - Any extra metadata params for file recording.
+     * @param { boolean } arg.transcription - Whether a transcription should be started or not.
      * @returns {void}
      */
     startRecording(options) {
@@ -1373,10 +1404,11 @@ export default class JitsiMeetExternalAPI extends EventEmitter {
      * Stops a recording or streaming session that is in progress.
      *
      * @param {string} mode - `file` or `stream`.
+     * @param {boolean} transcription - Whether the transcription needs to be stopped.
      * @returns {void}
      */
-    stopRecording(mode) {
-        this.executeCommand('stopRecording', mode);
+    stopRecording(mode, transcription) {
+        this.executeCommand('stopRecording', mode, transcription);
     }
 
     /**
@@ -1411,5 +1443,27 @@ export default class JitsiMeetExternalAPI extends EventEmitter {
                 exportedKey: false,
                 index }));
         }
+    }
+
+    /**
+     * Enable or disable the virtual background with a custom base64 image.
+     *
+     * @param {boolean} enabled - The boolean value to enable or disable.
+     * @param {string} backgroundImage - The base64 image.
+     * @returns {void}
+    */
+    setVirtualBackground(enabled, backgroundImage) {
+        this.executeCommand('setVirtualBackground', enabled, backgroundImage);
+    }
+
+    /**
+     * Opens the desktop picker. This is invoked by the Electron SDK when gDM is used.
+     *
+     * @returns {Promise}
+     */
+    _openDesktopPicker() {
+        return this._transport.sendRequest({
+            name: 'open-desktop-picker'
+        });
     }
 }

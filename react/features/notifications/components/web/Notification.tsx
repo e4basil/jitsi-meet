@@ -1,6 +1,7 @@
 import { Theme } from '@mui/material';
 import React, { isValidElement, useCallback, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSelector } from 'react-redux';
 import { keyframes } from 'tss-react';
 import { makeStyles } from 'tss-react/mui';
 
@@ -15,6 +16,7 @@ import {
     IconWarningCircle
 } from '../../../base/icons/svg';
 import Message from '../../../base/react/components/web/Message';
+import { getSupportUrl } from '../../../base/react/functions';
 import { withPixelLineHeight } from '../../../base/styles/functions.web';
 import { NOTIFICATION_ICON, NOTIFICATION_TYPE } from '../../constants';
 import { INotificationProps } from '../../types';
@@ -129,6 +131,7 @@ const useStyles = makeStyles()((theme: Theme) => {
             ...withPixelLineHeight(theme.typography.bodyShortRegular),
             overflow: 'auto',
             overflowWrap: 'break-word',
+            userSelect: 'all',
 
             '&:not(:empty)': {
                 marginTop: theme.spacing(1)
@@ -177,6 +180,7 @@ const Notification = ({
     description,
     descriptionArguments,
     descriptionKey,
+    disableClosing,
     hideErrorSupportLink,
     icon,
     onDismissed,
@@ -188,6 +192,7 @@ const Notification = ({
     const { classes, cx, theme } = useStyles();
     const { t } = useTranslation();
     const { unmounting } = useContext(NotificationsTransitionContext);
+    const supportUrl = useSelector(getSupportUrl);
 
     const ICON_COLOR = {
         error: theme.palette.iconError,
@@ -207,7 +212,7 @@ const Notification = ({
         descriptionKey
             && descriptionArray.push(t(descriptionKey, descriptionArguments));
 
-        description && descriptionArray.push(description);
+        description && typeof description === 'string' && descriptionArray.push(description);
 
         // Keeping in mind that:
         // - Notifications that use the `translateToHtml` function get an element-based description array with one entry
@@ -218,17 +223,18 @@ const Notification = ({
 
         // the id is used for testing the UI
         return (
-            <p
+            <div
                 className = { classes.description }
                 data-testid = { descriptionKey } >
                 {shouldRenderHtml ? descriptionArray : <Message text = { descriptionArray.join(' ') } />}
-            </p>
+                {typeof description === 'object' && description}
+            </div>
         );
     }, [ description, descriptionArguments, descriptionKey, classes ]);
 
-    const _onOpenSupportLink = () => {
-        window.open(interfaceConfig.SUPPORT_URL, '_blank', 'noopener');
-    };
+    const _onOpenSupportLink = useCallback(() => {
+        window.open(supportUrl, '_blank', 'noopener');
+    }, [ supportUrl ]);
 
     const mapAppearanceToButtons = useCallback((): {
         content: string; onClick: () => void; testId?: string; type?: string; }[] => {
@@ -241,7 +247,7 @@ const Notification = ({
                 }
             ];
 
-            if (!hideErrorSupportLink && interfaceConfig.SUPPORT_URL) {
+            if (!hideErrorSupportLink && supportUrl) {
                 buttons.push({
                     content: t('dialog.contactSupport'),
                     onClick: _onOpenSupportLink
@@ -276,7 +282,7 @@ const Notification = ({
 
             return [];
         }
-    }, [ appearance, onDismiss, customActionHandler, customActionNameKey, hideErrorSupportLink ]);
+    }, [ appearance, onDismiss, customActionHandler, customActionNameKey, hideErrorSupportLink, supportUrl ]);
 
     const getIcon = useCallback(() => {
         let iconToDisplay;
@@ -308,7 +314,9 @@ const Notification = ({
 
     return (
         <div
-            className = { cx(classes.container, unmounting.get(uid ?? '') && 'unmount') }
+            aria-atomic = 'false'
+            aria-live = 'polite'
+            className = { cx(classes.container, (unmounting.get(uid ?? '') && 'unmount') as string | undefined) }
             data-testid = { titleKey || descriptionKey }
             id = { uid }>
             <div className = { cx(classes.ribbon, appearance) } />
@@ -334,14 +342,17 @@ const Notification = ({
                         ))}
                     </div>
                 </div>
-                <Icon
-                    className = { classes.closeIcon }
-                    color = { theme.palette.icon04 }
-                    id = 'close-notification'
-                    onClick = { onDismiss }
-                    size = { 20 }
-                    src = { IconCloseLarge }
-                    testId = { `${titleKey || descriptionKey}-dismiss` } />
+                { !disableClosing && (
+                    <Icon
+                        className = { classes.closeIcon }
+                        color = { theme.palette.icon04 }
+                        id = 'close-notification'
+                        onClick = { onDismiss }
+                        size = { 20 }
+                        src = { IconCloseLarge }
+                        tabIndex = { 0 }
+                        testId = { `${titleKey || descriptionKey}-dismiss` } />
+                )}
             </div>
         </div>
     );

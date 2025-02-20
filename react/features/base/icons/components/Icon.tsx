@@ -8,6 +8,16 @@ import { IIconProps } from './types';
 interface IProps extends IIconProps {
 
     /**
+     * Optional label for screen reader users.
+     *
+     * If set, this is will add a `aria-label` attribute on the svg element,
+     * contrary to the aria* props which set attributes on the container element.
+     *
+     * Use this if the icon conveys meaning and is not clickable.
+     */
+    alt?: string;
+
+    /**
      * The id of the element this button icon controls.
      */
     ariaControls?: string;
@@ -114,7 +124,8 @@ export const DEFAULT_SIZE = navigator.product === 'ReactNative' ? 36 : 22;
  */
 export default function Icon(props: IProps) {
     const {
-        className,
+        alt,
+        className = '',
         color,
         id,
         containerId,
@@ -156,6 +167,13 @@ export default function Icon(props: IProps) {
 
     const jitsiIconClassName = calculatedColor ? 'jitsi-icon' : 'jitsi-icon jitsi-icon-default';
 
+    const iconProps = alt ? {
+        'aria-label': alt,
+        role: 'img'
+    } : {
+        'aria-hidden': true
+    };
+
     return (
         <Container
             { ...rest }
@@ -176,6 +194,7 @@ export default function Icon(props: IProps) {
             style = { restStyle }
             tabIndex = { tabIndex }>
             <IconComponent
+                { ...iconProps }
                 fill = { calculatedColor }
                 height = { calculatedSize }
                 id = { id }
@@ -183,7 +202,3 @@ export default function Icon(props: IProps) {
         </Container>
     );
 }
-
-Icon.defaultProps = {
-    className: ''
-};

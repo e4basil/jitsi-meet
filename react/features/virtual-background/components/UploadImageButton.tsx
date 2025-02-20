@@ -89,8 +89,13 @@ function UploadImageButton({
 
 
     const uploadImage = useCallback(async e => {
-        const reader = new FileReader();
         const imageFile = e.target.files;
+
+        if (imageFile.length === 0) {
+            return;
+        }
+
+        const reader = new FileReader();
 
         reader.readAsDataURL(imageFile[0]);
         reader.onload = async () => {
@@ -105,10 +110,10 @@ function UploadImageButton({
                 }
             ]);
             setOptions({
+                backgroundEffectEnabled: true,
                 backgroundType: VIRTUAL_BACKGROUND_TYPE.IMAGE,
-                enabled: true,
-                url,
-                selectedThumbnail: uuId
+                selectedThumbnail: uuId,
+                virtualSource: url
             });
         };
         logger.info('New virtual background image uploaded!');
@@ -122,7 +127,6 @@ function UploadImageButton({
     return (
         <>
             {showLabel && <label
-                aria-label = { t('virtualBackground.uploadImage') }
                 className = { classes.label }
                 htmlFor = 'file-upload'
                 onKeyPress = { uploadImageKeyPress }

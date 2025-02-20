@@ -1,5 +1,5 @@
 import { IStateful } from '../app/types';
-import { ConnectionFailedError } from '../connection/actions.any';
+import { ConnectionFailedError } from '../connection/types';
 import { toState } from '../redux/functions';
 
 import JitsiMeetJS from './_';
@@ -25,10 +25,6 @@ export function createLocalTrack(type: string, deviceId: string | null, timeout?
         JitsiMeetJS.createLocalTracks({
             cameraDeviceId: deviceId,
             devices: [ type ],
-
-            // eslint-disable-next-line camelcase
-            firefox_fake_device:
-                window.config?.firefox_fake_device,
             micDeviceId: deviceId,
             timeout,
             ...additionalOptions
